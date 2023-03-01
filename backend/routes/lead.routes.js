@@ -1,13 +1,12 @@
 const express = require("express");
+const { createLead } = require("../controllers/lead.controllers");
 const router = express.Router();
 
 router.get("/", (req, res) => {
   res.json({ message: "leads" });
 });
 
-router.post("/", (req, res) => {
-  res.json({ lead: req.body });
-});
+router.post("/", createLead);
 
 router.put("/:id", (req, res) => {
   res.json({ leadId: req.params.id });

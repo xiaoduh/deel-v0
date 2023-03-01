@@ -2,32 +2,36 @@ const mongoose = require("mongoose");
 
 const leadSchema = mongoose.Schema(
   {
-    dealerId: {
+    dealerID: {
       type: String,
-      required: true,
+      // required: true,
     },
     first_name: {
       type: String,
-      required: true,
+      // required: true,
     },
     last_name: {
       type: String,
-      required: true,
+      // required: true,
     },
     email: {
       type: String,
-      required: true,
+      // required: true,
     },
     phone_number: {
       type: String,
     },
     company: {
       type: String,
-      required: true,
+      // required: true,
+    },
+    lookingFor: {
+      type: String,
+      // required: true,
     },
     role: {
       type: String,
-      required: true,
+      // required: true,
     },
     price: {
       type: Number,
