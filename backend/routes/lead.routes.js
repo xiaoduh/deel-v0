@@ -1,23 +1,18 @@
 const express = require("express");
-const { createLead } = require("../controllers/lead.controllers");
+const {
+  createLead,
+  getLeads,
+  editLead,
+  buyLead,
+} = require("../controllers/lead.controllers");
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json({ message: "leads" });
-});
-
+router.get("/", getLeads);
 router.post("/", createLead);
-
-router.put("/:id", (req, res) => {
-  res.json({ leadId: req.params.id });
-});
-
-router.delete("/:id", (req, res) => {
-  res.json({ message: " Lead supprimé :" + req.params.id });
-});
-
-router.patch("/buy-lead/:id", (req, res) => {
-  res.json({ message: "Lead acheté :" + req.params.id });
-});
+router.put("/:id", editLead);
+router.patch("/buy-lead/:id", buyLead);
+// router.delete("/:id", (req, res) => {
+//   res.json({ message: " Lead supprimé :" + req.params.id });
+// });
 
 module.exports = router;
