@@ -34,7 +34,7 @@ module.exports.createLead = async (req, res) => {
 
 module.exports.editLead = async (req, res) => {
   if (!ObjectID.isValid(req.params.id))
-    return res.status(400).send("ID unknonw : " + req.params.id);
+    return res.status(400).send("ID lead unknown: " + req.params.id);
 
   const updateLead = await LeadModel.findByIdAndUpdate(
     req.params.id,

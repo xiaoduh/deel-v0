@@ -4,27 +4,27 @@ const dealerSchema = mongoose.Schema(
   {
     dealer_username: {
       type: String,
-      required: true,
+      // required: true,
     },
     first_name: {
       type: String,
-      required: true,
+      // required: true,
     },
     last_name: {
       type: String,
-      required: true,
+      // required: true,
     },
     email: {
       type: String,
-      required: true,
+      // required: true,
     },
     phone_number: {
       type: String,
-      required: true,
+      // required: true,
     },
     password: {
       type: String,
-      required: true,
+      // required: true,
     },
     deal: {
       type: [String],

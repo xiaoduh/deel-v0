@@ -13,6 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/lead", require("./routes/lead.routes"));
+app.use("/dealer", require("./routes/dealer.routes"));
 
 // Lancer le server
 app.listen(port, () => console.log("Le serveur a démarré au port " + port));
