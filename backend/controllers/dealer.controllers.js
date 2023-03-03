@@ -45,7 +45,16 @@ module.exports.editDealer = async (req, res) => {
   return res.status(200).json(updateDealer);
 };
 
-module.exports.getDealers = async (req, res) => {
+module.exports.getAllDealers = async (req, res) => {
   const dealers = await DealerModel.find();
   res.status(200).json(dealers);
+};
+
+module.exports.getUniqueDealer = async (req, res) => {
+  if (!ObjectID.isValid(req.params.id))
+    return res.status(400).send("ID unknown : " + req.params.id);
+
+  const uniqueDealer = await DealerModel.findById(req.params.id);
+  if (uniqueDealer) return res.status(200).json(uniqueDealer);
+  else console.log("ID unknown : " + req.params.id);
 };

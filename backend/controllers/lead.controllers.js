@@ -1,4 +1,6 @@
+const DealerModel = require("../models/dealer.model");
 const LeadModel = require("../models/lead.model");
+const UserModel = require("../models/user.model");
 const ObjectID = require("mongoose").Types.ObjectId;
 
 module.exports.getLeads = async (req, res) => {
@@ -54,7 +56,7 @@ module.exports.editLead = async (req, res) => {
 
 module.exports.buyLead = async (req, res) => {
   if (!ObjectID.isValid(req.params.id))
-    return res.status(400).send("ID unknonw : " + req.params.id);
+    return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
     const newBuyer = await LeadModel.findByIdAndUpdate(
@@ -64,7 +66,24 @@ module.exports.buyLead = async (req, res) => {
       },
       { new: true, upsert: true }
     );
-    res.status(200).json(newBuyer);
+
+    const newLead = await UserModel.findByIdAndUpdate(
+      req.body.userID,
+      {
+        $addToSet: { lead_bought: req.params.id },
+      },
+      { new: true, upsert: true }
+    );
+
+    const newUserBuyer = await DealerModel.findByIdAndUpdate(
+      req.body.dealerID,
+      {
+        $addToSet: { deal: req.params.id },
+      },
+      { new: true, upsert: true }
+    );
+    if (newBuyer && newLead && newUserBuyer)
+      res.status(200).json(newBuyer, newLead, newUserBuyer);
   } catch (error) {
     res.status(400).json(error);
   }

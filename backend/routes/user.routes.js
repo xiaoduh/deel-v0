@@ -1,17 +1,16 @@
 const express = require("express");
+const {
+  createUser,
+  editUser,
+  getAllUsers,
+  getUniqueUser,
+} = require("../controllers/user.controllers");
 const router = express.Router();
 
-router.get("/:id", (req, res) => {
-  res.json({ message: "user" });
-});
-
-router.post("/", (req, res) => {
-  res.json({ lead: req.body });
-});
-
-router.put("/:id", (req, res) => {
-  res.json({ userId: req.params.id });
-});
+router.get("/:id", getUniqueUser);
+router.get("/", getAllUsers);
+router.post("/", createUser);
+router.put("/:id", editUser);
 
 router.patch("/lead-bought/:id", (req, res) => {
   res.json({ message: "Lead acheté :" + req.params.id });

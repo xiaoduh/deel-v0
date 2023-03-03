@@ -2,11 +2,13 @@ const express = require("express");
 const {
   createDealer,
   editDealer,
-  getDealers,
-} = require("../controllers/dealer.model");
+  getAllDealers,
+  getUniqueDealer,
+} = require("../controllers/dealer.controllers");
 const router = express.Router();
 
-router.get("/", getDealers);
+router.get("/:id", getUniqueDealer);
+router.get("/", getAllDealers);
 router.post("/", createDealer);
 router.put("/:id", editDealer);
 
