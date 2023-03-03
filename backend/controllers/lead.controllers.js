@@ -1,6 +1,7 @@
 const DealerModel = require("../models/dealer.model");
 const LeadModel = require("../models/lead.model");
 const UserModel = require("../models/user.model");
+const { substratCoin, addCoin, isPositive } = require("../utils/balance.utils");
 const ObjectID = require("mongoose").Types.ObjectId;
 
 module.exports.getLeads = async (req, res) => {
@@ -58,6 +59,11 @@ module.exports.buyLead = async (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
+  const user = await UserModel.findById(req.body.userID);
+
+  if (!isPositive(user.coin))
+    return res.status(400).send("Coins balance : " + user.coin);
+
   try {
     const newBuyer = await LeadModel.findByIdAndUpdate(
       req.params.id,
@@ -75,6 +81,9 @@ module.exports.buyLead = async (req, res) => {
       { new: true, upsert: true }
     );
 
+    user.coin = substratCoin(user.coin);
+    await user.save();
+
     const newUserBuyer = await DealerModel.findByIdAndUpdate(
       req.body.dealerID,
       {
@@ -82,6 +91,11 @@ module.exports.buyLead = async (req, res) => {
       },
       { new: true, upsert: true }
     );
+
+    const dealer = await DealerModel.findById(req.body.dealerID);
+    dealer.coin = addCoin(dealer.coin);
+    await dealer.save();
+
     if (newBuyer && newLead && newUserBuyer)
       res.status(200).json(newBuyer, newLead, newUserBuyer);
   } catch (error) {
