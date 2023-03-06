@@ -1,5 +1,8 @@
 const UserModel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
+const Token = require("../models/token.model");
+const sendEmail = require("../utils/sendEmail.utils");
+const crypto = require("crypto");
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -89,4 +92,56 @@ module.exports.logoutUser = async (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
   res.redirect("/");
   //res.status(200).json({ deco: "deco" });
+};
+
+module.exports.userForgotPassword = async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ email: req.body.email });
+    if (!user)
+      return res
+        .status(400)
+        .send("Il n'existe aucun compte correspondant à cette adresse email");
+
+    let token = await Token.findOne({ userId: user._id });
+    if (!token) {
+      token = await new Token({
+        userId: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+    }
+
+    const link = `http://localhost:3000/reset-password/${user._id}/${token.token}`;
+    await sendEmail(
+      user.email,
+      "Ta demande de changement de mot de passe sur Tekos",
+      link
+    );
+
+    res.send("Un email t'as été envoyé à l'adresse Email renseignée");
+  } catch (error) {
+    res.send("An error occured");
+    console.log(error);
+  }
+};
+
+module.exports.userResetPassword = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if (!user) return res.status(400).send("invalid link or expired");
+
+    const token = await Token.findOne({
+      userId: user._id,
+      token: req.params.token,
+    });
+    if (!token) return res.status(400).send("Invalid link or expired");
+
+    user.password = req.body.password;
+    await user.save();
+    await token.delete();
+
+    res.send("password reset sucessfully.");
+  } catch (error) {
+    res.send("An error occured");
+    console.log(error);
+  }
 };

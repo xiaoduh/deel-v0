@@ -3,12 +3,22 @@ const authDealerController = require("../controllers/auth.dealer.controller");
 const dealerController = require("../controllers/dealer.controllers");
 const router = express.Router();
 
-// auth
+// dealer auth
 router.post("/register", authDealerController.signUpDealer);
 router.post("/login", authDealerController.signInDealer);
 router.get("/logout", authDealerController.logOutDealer);
 
-// CRUD
+// user Reset PW
+router.post(
+  "/seller-forgot-password",
+  authDealerController.dealerForgotPassword
+);
+router.post(
+  "/seller-reset-password/:id/:token",
+  authDealerController.dealerResetPassword
+);
+
+// dealer CRUD
 router.get("/:id", dealerController.getUniqueDealer);
 router.get("/", dealerController.getAllDealers);
 router.put("/:id", dealerController.editDealer);

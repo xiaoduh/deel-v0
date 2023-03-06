@@ -3,12 +3,19 @@ const userController = require("../controllers/user.controllers");
 const authUserController = require("../controllers/auth.user.controller");
 const router = express.Router();
 
-// auth
+// user auth
 router.post("/register", authUserController.signUpUser);
 router.post("/login", authUserController.signInUser);
 router.get("/logout", authUserController.logoutUser);
 
-// CRUD
+// user Reset PW
+router.post("/user-forgot-password", authUserController.userForgotPassword);
+router.post(
+  "/user-reset-password/:id/:token",
+  authUserController.userResetPassword
+);
+
+// user CRUD
 router.get("/:id", userController.getUniqueUser);
 router.get("/", userController.getAllUsers);
 // router.post("/", userController.createUser);
