@@ -60,6 +60,7 @@ module.exports.buyLead = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   const user = await UserModel.findById(req.body.userID);
+  const dealer = await DealerModel.findById(req.body.dealerID);
 
   if (!isPositive(user.coin))
     return res.status(400).send("Coins balance : " + user.coin);
@@ -77,24 +78,19 @@ module.exports.buyLead = async (req, res) => {
       req.body.userID,
       {
         $addToSet: { lead_bought: req.params.id },
+        $set: { coin: substratCoin(user.coin) },
       },
       { new: true, upsert: true }
     );
-
-    user.coin = substratCoin(user.coin);
-    await user.save();
 
     const newUserBuyer = await DealerModel.findByIdAndUpdate(
       req.body.dealerID,
       {
         $addToSet: { deal: req.params.id },
+        $set: { coin: addCoin(dealer.coin) },
       },
       { new: true, upsert: true }
     );
-
-    const dealer = await DealerModel.findById(req.body.dealerID);
-    dealer.coin = addCoin(dealer.coin);
-    await dealer.save();
 
     if (newBuyer && newLead && newUserBuyer)
       res.status(200).json(newBuyer, newLead, newUserBuyer);

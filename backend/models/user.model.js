@@ -52,7 +52,7 @@ const userSchema = mongoose.Schema(
     },
     coin: {
       type: Number,
-      default: 5,
+      default: 500,
     },
   },
   {

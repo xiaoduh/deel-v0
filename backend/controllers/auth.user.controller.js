@@ -69,7 +69,6 @@ module.exports.signUpUser = async (req, res) => {
 };
 
 module.exports.signInUser = async (req, res) => {
-  console.log("connexion user");
   const { email, password } = req.body;
 
   try {
@@ -77,12 +76,12 @@ module.exports.signInUser = async (req, res) => {
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge });
     res.status(200).json({ user: user._id });
-  } catch (error) {
+  } catch (err) {
     let errors = { email: "", password: "" };
 
-    if (error.message.includes("email")) errors.email = "Email inconnu";
+    if (err.message.includes("email")) errors.email = "Email inconnu";
 
-    if (error.message.includes("password"))
+    if (err.message.includes("password"))
       errors.password = "Le mot de passe ne correspond pas";
     res.status(200).json({ errors });
   }
@@ -91,7 +90,6 @@ module.exports.signInUser = async (req, res) => {
 module.exports.logoutUser = async (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
   res.redirect("/");
-  //res.status(200).json({ deco: "deco" });
 };
 
 module.exports.userForgotPassword = async (req, res) => {
