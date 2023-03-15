@@ -10,15 +10,7 @@ module.exports.getLeads = async (req, res) => {
 };
 
 module.exports.createLead = async (req, res) => {
-  if (
-    !req.body.first_name ||
-    !req.body.last_name ||
-    !req.body.email ||
-    !req.body.role ||
-    !req.body.company ||
-    !req.body.lookingFor ||
-    !req.body.dealerID
-  ) {
+  if (!req.body.company || !req.body.lookingFor || !req.body.dealerID) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
     const newLead = await LeadModel.create({
