@@ -4,11 +4,13 @@ const leadRoutes = require("./routes/lead.routes");
 const dealerRoutes = require("./routes/dealer.routes");
 const userRoutes = require("./routes/user.routes");
 const coinRoutes = require("./routes/coin.routes");
+const stripeRoutes = require("./routes/stripe.routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { checkUser, requireAuth } = require("./middleware/auth.user.middleware");
 const dotenv = require("dotenv").config();
 const cors = require("cors");
+
 
 const app = express();
 
@@ -43,6 +45,7 @@ app.use("/api/lead", leadRoutes);
 app.use("/api/dealer", dealerRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/coin", coinRoutes);
+app.use("/api/stripe", stripeRoutes);
 
 // Lancer le server
 app.listen(process.env.PORT, () =>

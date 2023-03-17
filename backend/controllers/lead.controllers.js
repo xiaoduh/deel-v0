@@ -47,6 +47,7 @@ module.exports.editLead = async (req, res) => {
   return res.status(200).json(updateLead);
 };
 
+// probably to relocated in stripe controllers
 module.exports.buyLead = async (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
