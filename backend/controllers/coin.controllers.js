@@ -8,13 +8,16 @@ module.exports.buyCoin = async (req, res) => {
 
   try {
     const newCoin = parseInt(req.body.coin);
-    const user = await UserModel.findById(req.params.id);
+    const credit = await UserModel.findById(req.params.id);
+    const user = await UserModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: { coin: credit.coin + newCoin },
+      },
+      { new: true, upsert: true }
+    );
 
-    user.coin = user.coin + newCoin;
-
-    await user.save();
-
-    res.status(200).send(newCoin + "coin added to user : " + req.params.id);
+    res.status(200).send(user);
   } catch (error) {
     res.status(400).json(error);
   }
