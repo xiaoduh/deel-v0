@@ -1,22 +1,22 @@
 const nodemailer = require("nodemailer");
 
-module.exports.sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, link) => {
   try {
-    const transporter = await nodemailer.createTransport({
-      service: process.env.SERVICE,
-      port: 587,
-      secure: true,
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASS,
+        user: process.env.EMAIL_SENDER,
+        pass: process.env.NODEMAILER_PASS,
       },
     });
 
     await transporter.sendMail({
-      from: process.env.USER,
+      from: "no-reply Tekos",
       to: email,
       subject: subject,
-      text: text,
+      text:
+        "Bonjour, merci de suivre le lien ci après pour valider ton compte : " +
+        link,
     });
 
     console.log("email sent successfully");
@@ -24,3 +24,5 @@ module.exports.sendEmail = async (email, subject, text) => {
     console.log("email not sent" + err);
   }
 };
+
+module.exports = sendEmail;

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Token = require("../models/token.model");
 const sendEmail = require("../utils/sendEmail.utils");
 const crypto = require("crypto");
+const dotenv = require("dotenv").config();
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -31,7 +32,19 @@ module.exports.signUpUser = async (req, res) => {
       phone_number,
       password,
     });
-    res.status(201).json({ user: user._id });
+
+    const token = await new Token({
+      userId: user._id,
+      token: crypto.randomBytes(32).toString("hex"),
+    }).save();
+
+    const url = `${process.env.CLIENT_URL}/user/${user._id}/verify/${token.token}`;
+
+    await sendEmail(user.email, "Validez votre Email", url);
+
+    res
+      .status(201)
+      .json({ message: "An Email sent to your account please verify" });
   } catch (err) {
     let errors = {
       user_username: "",
@@ -68,11 +81,64 @@ module.exports.signUpUser = async (req, res) => {
   }
 };
 
+module.exports.verifyEmail = async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ _id: req.params.id });
+    if (!user) return res.status(400).send({ message: "Invalid link" });
+
+    const token = await Token.findOne({
+      userId: user._id,
+      token: req.params.token,
+    });
+
+    if (!token) return res.status(400).send({ message: "Invalid link" });
+
+    await UserModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          isVerified: true,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+    console.log(token);
+    await Token.deleteOne({ _id: token._id });
+    res.status(200).send({ message: "Email Verified Successfully" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 module.exports.signInUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await UserModel.login(email, password);
+    if (!user.isVerified) {
+      let token = await Token.findOne({
+        userId: user._id,
+      });
+      if (!token) {
+        token = await new Token({
+          userId: user._id,
+          token: crypto.randomBytes(32).toString("hex"),
+        }).save();
+
+        const url = `${process.env.CLIENT_URL}/user/${user._id}/verify/${token.token._id}`;
+
+        await sendVerifyEmail(user.email, "Valider votre Email", url);
+      }
+      res
+        .status(400)
+        .send({ message: "An Email sent to your account please verify" });
+    }
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge });
     res.status(200).json({ user: user._id });
