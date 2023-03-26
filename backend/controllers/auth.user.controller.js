@@ -116,6 +116,34 @@ module.exports.verifyEmail = async (req, res) => {
   }
 };
 
+module.exports.verifyPhoneNumber = async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ _id: req.params.id });
+    if (!user)
+      return res.status(400).send({ message: "Utilisateur not found" });
+
+    await UserModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          twoFA: true,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 module.exports.signInUser = async (req, res) => {
   const { email, password } = req.body;
 

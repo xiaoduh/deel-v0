@@ -8,6 +8,7 @@ router.post("/register", authUserController.signUpUser);
 router.post("/login", authUserController.signInUser);
 router.get("/logout", authUserController.logoutUser);
 router.get("/:id/verify/:token", authUserController.verifyEmail);
+router.put("/verify/number/:id", authUserController.verifyPhoneNumber);
 
 // user Reset PW
 router.post("/user-forgot-password", authUserController.userForgotPassword);

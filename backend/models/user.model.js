@@ -58,6 +58,10 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    twoFA: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
