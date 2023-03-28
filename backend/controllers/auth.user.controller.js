@@ -232,7 +232,7 @@ module.exports.userForgotPassword = async (req, res) => {
       }).save();
     }
 
-    const link = `http://localhost:3000/reset-password/${user._id}/${token.token}`;
+    const link = `http://localhost:3000/api/user/user-reset-password/${user._id}/${token.token}`;
     const text =
       "Bonjour, pour changer votre mot de passe veuillez suivre le lien ci après : ";
     await sendEmail(
