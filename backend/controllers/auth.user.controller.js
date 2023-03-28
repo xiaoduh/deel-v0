@@ -13,6 +13,7 @@ const createToken = (id) => {
   });
 };
 
+//creation du compte + envoi d'un lien de validation d'email
 module.exports.signUpUser = async (req, res) => {
   const {
     user_username,
@@ -39,8 +40,9 @@ module.exports.signUpUser = async (req, res) => {
     }).save();
 
     const url = `${process.env.CLIENT_URL}/user/${user._id}/verify/${token.token}`;
-
-    await sendEmail(user.email, "Validez votre Email", url);
+    const text =
+      "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
+    await sendEmail(user.email, "Deeel.fr - Validez votre Email", text, url);
 
     res
       .status(201)
@@ -81,6 +83,7 @@ module.exports.signUpUser = async (req, res) => {
   }
 };
 
+//verification de l'email + validation du compte
 module.exports.verifyEmail = async (req, res) => {
   try {
     const user = await UserModel.findOne({ _id: req.params.id });
@@ -144,6 +147,7 @@ module.exports.verifyPhoneNumber = async (req, res) => {
   }
 };
 
+//connexion utilisateur/ test si email est vérifié si oui connexion si non envoi d'un lien de validation
 module.exports.signInUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -160,8 +164,15 @@ module.exports.signInUser = async (req, res) => {
         }).save();
 
         const url = `${process.env.CLIENT_URL}/user/${user._id}/verify/${token.token._id}`;
+        const text =
+          "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
 
-        await sendVerifyEmail(user.email, "Valider votre Email", url);
+        await sendVerifyEmail(
+          user.email,
+          "Deeel.fr - Validez votre Email",
+          text,
+          url
+        );
       }
       res
         .status(400)
@@ -181,6 +192,7 @@ module.exports.signInUser = async (req, res) => {
   }
 };
 
+// déconnexion du user, 2FA passe à false, on retire le jwt, et on redirige le user sur /
 module.exports.logoutUser = async (req, res) => {
   try {
     await UserModel.findOneAndUpdate(
@@ -203,6 +215,7 @@ module.exports.logoutUser = async (req, res) => {
   } catch (error) {}
 };
 
+// on test si l'email est connnu, si oui on crée un token, puis envoi un email avec un lien composé de l'id du user + le token_id
 module.exports.userForgotPassword = async (req, res) => {
   try {
     const user = await UserModel.findOne({ email: req.body.email });
@@ -220,9 +233,12 @@ module.exports.userForgotPassword = async (req, res) => {
     }
 
     const link = `http://localhost:3000/reset-password/${user._id}/${token.token}`;
+    const text =
+      "Bonjour, pour changer votre mot de passe veuillez suivre le lien ci après : ";
     await sendEmail(
       user.email,
-      "Ta demande de changement de mot de passe sur Tekos",
+      "Deeel.fr - changement de mot de passe",
+      text,
       link
     );
 
@@ -233,6 +249,7 @@ module.exports.userForgotPassword = async (req, res) => {
   }
 };
 
+// on vérifie si le lien est valide user_id et token_id
 module.exports.userResetPassword = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id);

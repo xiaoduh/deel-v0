@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (email, subject, link) => {
+const sendEmail = async (email, subject, text, link) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -14,9 +14,7 @@ const sendEmail = async (email, subject, link) => {
       from: "no-reply Tekos",
       to: email,
       subject: subject,
-      text:
-        "Bonjour, merci de suivre le lien ci après pour valider ton compte : " +
-        link,
+      text: text + link,
     });
 
     console.log("email sent successfully");
