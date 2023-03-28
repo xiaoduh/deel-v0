@@ -6,7 +6,7 @@ const router = express.Router();
 // user auth
 router.post("/register", authUserController.signUpUser);
 router.post("/login", authUserController.signInUser);
-router.get("/logout", authUserController.logoutUser);
+router.get("/logout/:id", authUserController.logoutUser);
 router.get("/:id/verify/:token", authUserController.verifyEmail);
 router.put("/verify/number/:id", authUserController.verifyPhoneNumber);
 

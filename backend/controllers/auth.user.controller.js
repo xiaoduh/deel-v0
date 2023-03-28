@@ -182,8 +182,25 @@ module.exports.signInUser = async (req, res) => {
 };
 
 module.exports.logoutUser = async (req, res) => {
-  res.cookie("jwt", "", { maxAge: 1 });
-  res.redirect("/");
+  try {
+    await UserModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          twoFA: false,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+    res.cookie("jwt", "", { maxAge: 1 });
+    res.redirect("/");
+  } catch (error) {}
 };
 
 module.exports.userForgotPassword = async (req, res) => {
