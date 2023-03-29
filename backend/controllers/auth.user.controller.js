@@ -4,6 +4,7 @@ const Token = require("../models/token.model");
 const sendEmail = require("../utils/sendEmail.utils");
 const crypto = require("crypto");
 const dotenv = require("dotenv").config();
+const bcrypt = require("bcrypt");
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -251,6 +252,8 @@ module.exports.userForgotPassword = async (req, res) => {
 
 // on vérifie si le lien est valide user_id et token_id
 module.exports.userResetPassword = async (req, res) => {
+  const newPassword = req.body.password;
+  console.log(newPassword);
   try {
     const user = await UserModel.findById(req.params.id);
     if (!user) return res.status(400).send("invalid link or expired");
@@ -261,8 +264,24 @@ module.exports.userResetPassword = async (req, res) => {
     });
     if (!token) return res.status(400).send("Invalid link or expired");
 
-    user.password = req.body.password;
-    await user.save();
+    const salt = await bcrypt.genSalt();
+    pw = await bcrypt.hash(newPassword, salt);
+
+    await UserModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          password: pw,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
     await token.delete();
 
     res.send("password reset sucessfully.");

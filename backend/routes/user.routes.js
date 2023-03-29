@@ -12,7 +12,7 @@ router.put("/verify/number/:id", authUserController.verifyPhoneNumber);
 
 // user Reset PW
 router.post("/user-forgot-password", authUserController.userForgotPassword);
-router.post(
+router.put(
   "/user-reset-password/:id/:token",
   authUserController.userResetPassword
 );
