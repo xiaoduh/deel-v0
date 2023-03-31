@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const Token = require("../models/token.model");
 const sendEmail = require("../utils/sendEmail.utils");
 const crypto = require("crypto");
+const dotenv = require("dotenv").config();
+const bcrypt = require("bcrypt");
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -12,6 +14,7 @@ const createToken = (id) => {
   });
 };
 
+//creation du compte + envoi d'un lien de validation d'email
 module.exports.signUpUser = async (req, res) => {
   const {
     user_username,
@@ -31,7 +34,20 @@ module.exports.signUpUser = async (req, res) => {
       phone_number,
       password,
     });
-    res.status(201).json({ user: user._id });
+
+    const token = await new Token({
+      userId: user._id,
+      token: crypto.randomBytes(32).toString("hex"),
+    }).save();
+
+    const url = `https://app-deeel.netlify.app/user/${user._id}/verify/${token.token}`;
+    const text =
+      "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
+    await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+
+    res
+      .status(201)
+      .json({ message: "An Email sent to your account please verify" });
   } catch (err) {
     let errors = {
       user_username: "",
@@ -68,6 +84,71 @@ module.exports.signUpUser = async (req, res) => {
   }
 };
 
+//verification de l'email + validation du compte
+module.exports.verifyEmail = async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ _id: req.params.id });
+    if (!user) return res.status(400).send({ message: "Invalid link" });
+
+    const token = await Token.findOne({
+      userId: user._id,
+      token: req.params.token,
+    });
+
+    if (!token) return res.status(400).send({ message: "Invalid link" });
+
+    await UserModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          isVerified: true,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+    console.log(token);
+    await Token.deleteOne({ _id: token._id });
+    res.status(200).send({ message: "Email Verified Successfully" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+module.exports.verifyPhoneNumber = async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ _id: req.params.id });
+    if (!user)
+      return res.status(400).send({ message: "Utilisateur not found" });
+
+    await UserModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          twoFA: true,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+//connexion utilisateur/ test si email est vérifié si oui connexion si non envoi d'un lien de validation
 module.exports.signInUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -87,11 +168,30 @@ module.exports.signInUser = async (req, res) => {
   }
 };
 
+// déconnexion du user, 2FA passe à false, on retire le jwt, et on redirige le user sur /
 module.exports.logoutUser = async (req, res) => {
-  res.cookie("jwt", "", { maxAge: 1 });
-  res.redirect("/");
+  try {
+    await UserModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          twoFA: false,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+    res.cookie("jwt", "", { maxAge: 1 });
+    res.redirect("/");
+  } catch (error) {}
 };
 
+// on test si l'email est connnu, si oui on crée un token, puis envoi un email avec un lien composé de l'id du user + le token_id
 module.exports.userForgotPassword = async (req, res) => {
   try {
     const user = await UserModel.findOne({ email: req.body.email });
@@ -108,10 +208,13 @@ module.exports.userForgotPassword = async (req, res) => {
       }).save();
     }
 
-    const link = `http://localhost:3000/reset-password/${user._id}/${token.token}`;
+    const link = `https://app-deeel.netlify.app/api/user/user-reset-password/${user._id}/${token.token}`;
+    const text =
+      "Bonjour, pour changer votre mot de passe veuillez suivre le lien ci après : ";
     await sendEmail(
       user.email,
-      "Ta demande de changement de mot de passe sur Tekos",
+      "Deeel.fr - changement de mot de passe",
+      text,
       link
     );
 
@@ -122,7 +225,10 @@ module.exports.userForgotPassword = async (req, res) => {
   }
 };
 
+// on vérifie si le lien est valide user_id et token_id
 module.exports.userResetPassword = async (req, res) => {
+  const newPassword = req.body.password;
+  console.log(newPassword);
   try {
     const user = await UserModel.findById(req.params.id);
     if (!user) return res.status(400).send("invalid link or expired");
@@ -133,8 +239,24 @@ module.exports.userResetPassword = async (req, res) => {
     });
     if (!token) return res.status(400).send("Invalid link or expired");
 
-    user.password = req.body.password;
-    await user.save();
+    const salt = await bcrypt.genSalt();
+    pw = await bcrypt.hash(newPassword, salt);
+
+    await UserModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          password: pw,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
     await token.delete();
 
     res.send("password reset sucessfully.");
