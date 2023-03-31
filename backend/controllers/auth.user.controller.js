@@ -154,31 +154,31 @@ module.exports.signInUser = async (req, res) => {
 
   try {
     const user = await UserModel.login(email, password);
-    // if (!user.isVerified) {
-    //   let token = await Token.findOne({
-    //     userId: user._id,
-    //   });
-    //   if (!token) {
-    //     token = await new Token({
-    //       userId: user._id,
-    //       token: crypto.randomBytes(32).toString("hex"),
-    //     }).save();
+    if (!user.isVerified) {
+      let token = await Token.findOne({
+        userId: user._id,
+      });
+      if (!token) {
+        token = await new Token({
+          userId: user._id,
+          token: crypto.randomBytes(32).toString("hex"),
+        }).save();
 
-    //     const url = `${process.env.CLIENT_URL}/user/${user._id}/verify/${token.token._id}`;
-    //     const text =
-    //       "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
+        const url = `${process.env.CLIENT_URL}/user/${user._id}/verify/${token.token._id}`;
+        const text =
+          "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
 
-    //     await sendVerifyEmail(
-    //       user.email,
-    //       "deeel.fr - Validez votre Email",
-    //       text,
-    //       url
-    //     );
-    //   }
-    //   res
-    //     .status(400)
-    //     .send({ message: "An Email sent to your account please verify" });
-    // }
+        await sendVerifyEmail(
+          user.email,
+          "deeel.fr - Validez votre Email",
+          text,
+          url
+        );
+      }
+      res
+        .status(400)
+        .send({ message: "An Email sent to your account please verify" });
+    }
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge });
     res.status(200).json({ user: user._id });
