@@ -48,6 +48,6 @@ app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
 
 // Lancer le server
-app.listen(process.env.PORT, () =>
-  console.log("Le serveur a démarré au port " + process.env.PORT)
+app.listen(() =>
+  console.log("Le serveur a démarré")
 );
