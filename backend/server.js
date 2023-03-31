@@ -15,7 +15,7 @@ const cors = require("cors");
 const app = express();
 
 const corsOptions = {
-  origin: https://app-deeel.netlify.app,
+  origin: https://app-deeel.netlify.app/,
   credentials: true,
   allowedHeaders: ["sessionId", "Content-Type"],
   exposedHeaders: ["sessionId"],
