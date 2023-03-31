@@ -7,9 +7,13 @@ const crypto = require("crypto");
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
 const createToken = (id) => {
-  return jwt.sign({ id }, process.env.TOKEN_SECRET, {
-    expiresIn: maxAge,
-  });
+  return jwt.sign(
+    { id },
+    "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5ceyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+    {
+      expiresIn: maxAge,
+    }
+  );
 };
 
 module.exports.signUpDealer = async (req, res) => {

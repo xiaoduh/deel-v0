@@ -1,6 +1,8 @@
 const Stripe = require("stripe");
 const dotenv = require("dotenv").config();
-const stripe = Stripe(process.env.STRIPE_SECRET_TEST);
+const stripe = Stripe(
+  "sk_test_51MmFnAAFkffstGESG9xnjXgxebTGnoNzsoPRBVFx8fmeOgTSshW6fKe2KRaq9brPdqf7JnuXBRovI3AC73P2KaP800R2Kd2lCh"
+);
 const UserModel = require("../models/user.model");
 const ObjectID = require("mongoose").Types.ObjectId;
 

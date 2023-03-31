@@ -8,14 +8,13 @@ const stripeRoutes = require("./routes/stripe.routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { checkUser, requireAuth } = require("./middleware/auth.user.middleware");
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv").config({ path: "./config" });
 const cors = require("cors");
-
 
 const app = express();
 
 const corsOptions = {
-  origin: process.env.CLIENT_URL,
+  origin: "https://app-deeel.netlify.app/",
   credentials: true,
   allowedHeaders: ["sessionId", "Content-Type"],
   exposedHeaders: ["sessionId"],
@@ -48,6 +47,4 @@ app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
 
 // Lancer le server
-app.listen(process.env.PORT, () =>
-  console.log("Le serveur a démarré au port " + process.env.PORT)
-);
+app.listen(5000, () => console.log("Le serveur a démarré au port " + 5000));
