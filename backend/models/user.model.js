@@ -52,7 +52,15 @@ const userSchema = mongoose.Schema(
     },
     coin: {
       type: Number,
-      default: 500,
+      default: 1,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    twoFA: {
+      type: Boolean,
+      default: false,
     },
   },
   {
