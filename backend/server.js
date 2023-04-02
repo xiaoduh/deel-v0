@@ -49,4 +49,4 @@ app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
 
 // Lancer le server
-app.listen(() => console.log("Server is running"));
+app.listen(5000, () => console.log("Server is running au port 5000"));
