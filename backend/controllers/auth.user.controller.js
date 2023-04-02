@@ -217,7 +217,7 @@ module.exports.userForgotPassword = async (req, res) => {
       "Bonjour, pour changer votre mot de passe veuillez suivre le lien ci après : ";
     await sendEmail(
       user.email,
-      "Deeel.fr - changement de mot de passe",
+      "deeel.fr - changement de mot de passe",
       text,
       link
     );
