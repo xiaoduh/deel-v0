@@ -13,6 +13,8 @@ const cors = require("cors");
 
 const app = express();
 
+// origin: "http://localhost:3000",
+
 const corsOptions = {
   origin: "*",
   credentials: true,
@@ -47,4 +49,4 @@ app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
 
 // Lancer le server
-app.listen(5000, () => console.log("Le serveur a démarré au port " + 5000));
+app.listen(() => console.log("Server is running"));
