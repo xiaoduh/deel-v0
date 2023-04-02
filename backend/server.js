@@ -13,7 +13,7 @@ const cors = require("cors");
 const app = express();
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: "https://app-deeel.netlify.app",
   credentials: true,
   allowedHeaders: ["sessionId", "Content-Type"],
   exposedHeaders: ["sessionId"],
@@ -46,4 +46,4 @@ app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
 
 // Lancer le server
-app.listen(5000, () => console.log("Le serveur a démarré au port " + 5000));
+app.listen(() => console.log("Listenning"));
