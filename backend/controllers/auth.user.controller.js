@@ -44,7 +44,7 @@ module.exports.signUpUser = async (req, res) => {
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
 
-    const url = `https://app-deeel.netlify.app/user/${user._id}/verify/${token.token}`;
+    const url = `http://localhost:5000/api/user/${user._id}/verify/${token.token}`;
     const text =
       "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
     await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
@@ -212,12 +212,12 @@ module.exports.userForgotPassword = async (req, res) => {
       }).save();
     }
 
-    const link = `https://app-deeel.netlify.app/api/user/user-reset-password/${user._id}/${token.token}`;
+    const link = `http://localhost:3000/api/user/user-reset-password/${user._id}/${token.token}`;
     const text =
       "Bonjour, pour changer votre mot de passe veuillez suivre le lien ci après : ";
     await sendEmail(
       user.email,
-      "Deeel.fr - changement de mot de passe",
+      "deeel.fr - changement de mot de passe",
       text,
       link
     );
