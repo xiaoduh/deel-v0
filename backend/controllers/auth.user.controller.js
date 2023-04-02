@@ -43,7 +43,7 @@ module.exports.signUpUser = async (req, res) => {
       userId: user._id,
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
-
+    
     const url = `http://localhost:5000/api/user/${user._id}/verify/${token.token}`;
     const text =
       "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";

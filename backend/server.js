@@ -8,7 +8,6 @@ const stripeRoutes = require("./routes/stripe.routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { checkUser, requireAuth } = require("./middleware/auth.user.middleware");
-const dotenv = require("dotenv").config({ path: "./config" });
 const cors = require("cors");
 
 const app = express();
