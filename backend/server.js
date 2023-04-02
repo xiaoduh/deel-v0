@@ -46,4 +46,4 @@ app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
 
 // Lancer le server
-app.listen(() => console.log("Listenning"));
+app.listen(() => console.log("Server is running"));
