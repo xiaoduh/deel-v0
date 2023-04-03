@@ -44,7 +44,7 @@ module.exports.signUpUser = async (req, res) => {
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
 
-    const url = `https://app-deeel.netlify.app/api/user/${user._id}/verify/${token.token}`;
+    const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
     const text =
       "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
     await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
