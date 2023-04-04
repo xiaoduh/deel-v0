@@ -222,7 +222,7 @@ module.exports.userForgotPassword = async (req, res) => {
       link
     );
 
-    res.send("Un email t'as été envoyé à l'adresse Email renseignée");
+    res.send("Un email t'a été envoyé à l'adresse Email renseignée");
   } catch (error) {
     res.send("An error occured");
     console.log(error);
