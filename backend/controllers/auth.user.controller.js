@@ -43,7 +43,7 @@ module.exports.signUpUser = async (req, res) => {
       userId: user._id,
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
-    
+
     const url = `http://localhost:5000/api/user/${user._id}/verify/${token.token}`;
     const text =
       "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
@@ -175,21 +175,21 @@ module.exports.signInUser = async (req, res) => {
 // déconnexion du user, 2FA passe à false, on retire le jwt, et on redirige le user sur /
 module.exports.logoutUser = async (req, res) => {
   try {
-    await UserModel.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      {
-        $set: {
-          twoFA: false,
-        },
-      },
-      {
-        new: true,
-        upsert: true,
-        setDefaultsOnInsert: true,
-      }
-    );
+    // await UserModel.findOneAndUpdate(
+    //   {
+    //     _id: req.params.id,
+    //   },
+    //   {
+    //     $set: {
+    //       twoFA: false,
+    //     },
+    //   },
+    //   {
+    //     new: true,
+    //     upsert: true,
+    //     setDefaultsOnInsert: true,
+    //   }
+    // );
     res.cookie("jwt", "", { maxAge: 1 });
     res.redirect("/");
   } catch (error) {}
