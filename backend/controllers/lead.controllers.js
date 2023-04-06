@@ -5,7 +5,7 @@ const { substratCoin, addCoin, isPositive } = require("../utils/balance.utils");
 const ObjectID = require("mongoose").Types.ObjectId;
 
 module.exports.getLeads = async (req, res) => {
-  const leads = await LeadModel.find();
+  const leads = await LeadModel.find().sort({ createdAt: -1 });
   res.status(200).json(leads);
 };
 

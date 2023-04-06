@@ -20,6 +20,7 @@ const createToken = (id) => {
 
 //creation du compte + envoi d'un lien de validation d'email
 module.exports.signUpUser = async (req, res) => {
+
   const {
     user_username,
     first_name,
