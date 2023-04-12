@@ -22,6 +22,7 @@ module.exports.createLead = async (req, res) => {
       first_name: req.body.first_name,
       last_name: req.body.last_name,
       email: req.body.email,
+      phone: req.body.phone,
       role: req.body.role,
       company: req.body.company,
       sector: req.body.sector,
