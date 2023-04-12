@@ -20,6 +20,10 @@ const leadSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    statut: {
+      type: Boolean,
+      default: true,
+    },
     company: {
       type: String,
       required: true,
