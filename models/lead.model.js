@@ -16,10 +16,15 @@ const leadSchema = mongoose.Schema(
     email: {
       type: String,
     },
-    phone_number: {
+    phone: {
       type: String,
+      default: "",
     },
     company: {
+      type: String,
+      required: true,
+    },
+    sector: {
       type: String,
       required: true,
     },

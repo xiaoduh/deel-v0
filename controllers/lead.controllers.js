@@ -10,7 +10,12 @@ module.exports.getLeads = async (req, res) => {
 };
 
 module.exports.createLead = async (req, res) => {
-  if (!req.body.company || !req.body.lookingFor || !req.body.dealerID) {
+  if (
+    !req.body.company ||
+    !req.body.lookingFor ||
+    !req.body.dealerID ||
+    !req.body.sector
+  ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
     const newLead = await LeadModel.create({
@@ -19,6 +24,7 @@ module.exports.createLead = async (req, res) => {
       email: req.body.email,
       role: req.body.role,
       company: req.body.company,
+      sector: req.body.sector,
       lookingFor: req.body.lookingFor,
       dealerID: req.body.dealerID,
     });
@@ -37,7 +43,9 @@ module.exports.editLead = async (req, res) => {
       first_name: req.body.first_name,
       last_name: req.body.last_name,
       email: req.body.email,
+      role: req.body.role,
       company: req.body.company,
+      sector: req.body.company,
       lookingFor: req.body.lookingFor,
       role: req.body.role,
     },
