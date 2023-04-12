@@ -24,6 +24,10 @@ const leadSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    sector: {
+      type: String,
+      required: true,
+    },
     lookingFor: {
       type: String,
       required: true,
