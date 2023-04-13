@@ -20,7 +20,7 @@ const leadSchema = mongoose.Schema(
       type: String,
       default: "",
     },
-    statut: {
+    isOpen: {
       type: Boolean,
       default: true,
     },
