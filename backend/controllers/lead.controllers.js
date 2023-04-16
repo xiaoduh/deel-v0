@@ -18,6 +18,8 @@ module.exports.createLead = async (req, res) => {
   ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
+    const dealer = await DealerModel.findById(req.body.dealerID);
+    console.log(dealer.nb_lead);
     const newLead = await LeadModel.create({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
@@ -30,7 +32,15 @@ module.exports.createLead = async (req, res) => {
       dealerID: req.body.dealerID,
     });
 
-    res.status(200).json(newLead);
+    const newNumberLead = await DealerModel.findByIdAndUpdate(
+      req.body.dealerID,
+      {
+        $set: { nb_lead: dealer.nb_lead + 1 },
+      },
+      { new: true, upsert: true }
+    );
+
+    if (newLead && newNumberLead) res.status(200).json(newLead);
   }
 };
 

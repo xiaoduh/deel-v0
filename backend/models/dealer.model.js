@@ -58,6 +58,10 @@ const dealerSchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    nb_lead: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

@@ -46,6 +46,10 @@ const leadSchema = mongoose.Schema(
     buyer: {
       type: [String],
     },
+    status: {
+      type: String,
+      default: "pending",
+    },
   },
   {
     timestamps: true,
