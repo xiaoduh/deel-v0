@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Token = require("../models/token.model");
 const sendEmail = require("../utils/sendEmail.utils");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -105,18 +106,21 @@ module.exports.dealerForgotPassword = async (req, res) => {
         .status(400)
         .send("Il n'existe aucun compte correspondant à cette adresse email");
 
-    let token = await Token.findOne({ dealerId: dealer._id });
+    let token = await Token.findOne({ userId: dealer._id });
     if (!token) {
       token = await new Token({
-        dealerId: dealer._id,
+        userId: dealer._id,
         token: crypto.randomBytes(32).toString("hex"),
       }).save();
     }
 
-    const link = `http://localhost:3000/reset-password/${user._id}/${token.token}`;
+    const link = `http://localhost:3000/dealer/dealer-reset-password/${dealer._id}/${token.token}`;
+    const text =
+      "Bonjour, pour changer votre mot de passe veuillez suivre le lien ci après : ";
     await sendEmail(
       dealer.email,
-      "Ta demande de changement de mot de passe sur Tekos",
+      "deeel.fr - changement de mot de passe",
+      text,
       link
     );
 
@@ -128,18 +132,36 @@ module.exports.dealerForgotPassword = async (req, res) => {
 };
 
 module.exports.dealerResetPassword = async (req, res) => {
+  const newPassword = req.body.password;
+  console.log(newPassword);
   try {
     const dealer = await DealerModel.findById(req.params.id);
-    if (!dealer) return res.status(400).send("invalid link or expired");
+    if (!dealer) return res.status(400).send("invalid id");
 
     const token = await Token.findOne({
-      dealerId: dealer._id,
+      userId: dealer._id,
       token: req.params.token,
     });
-    if (!token) return res.status(400).send("Invalid link or expired");
+    if (!token) return res.status(400).send("Invalid token");
 
-    dealer.password = req.body.password;
-    await dealer.save();
+    const salt = await bcrypt.genSalt();
+    pw = await bcrypt.hash(newPassword, salt);
+
+    await DealerModel.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        $set: {
+          password: pw,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
     await token.delete();
 
     res.send("password reset sucessfully.");

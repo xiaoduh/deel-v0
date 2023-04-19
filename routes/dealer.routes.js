@@ -10,11 +10,11 @@ router.get("/logout", authDealerController.logOutDealer);
 
 // user Reset PW
 router.post(
-  "/seller-forgot-password",
+  "/dealer-forgot-password",
   authDealerController.dealerForgotPassword
 );
-router.post(
-  "/seller-reset-password/:id/:token",
+router.put(
+  "/dealer-reset-password/:id/:token",
   authDealerController.dealerResetPassword
 );
 

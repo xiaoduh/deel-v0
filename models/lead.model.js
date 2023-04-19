@@ -32,6 +32,10 @@ const leadSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    region: {
+      type: String,
+      required: true,
+    },
     lookingFor: {
       type: String,
       required: true,
