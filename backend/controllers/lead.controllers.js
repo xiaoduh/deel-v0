@@ -14,7 +14,8 @@ module.exports.createLead = async (req, res) => {
     !req.body.company ||
     !req.body.lookingFor ||
     !req.body.dealerID ||
-    !req.body.sector
+    !req.body.sector ||
+    !req.body.region
   ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
@@ -28,6 +29,7 @@ module.exports.createLead = async (req, res) => {
       role: req.body.role,
       company: req.body.company,
       sector: req.body.sector,
+      region: req.body.region,
       lookingFor: req.body.lookingFor,
       dealerID: req.body.dealerID,
     });
