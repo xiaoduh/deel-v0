@@ -1,4 +1,3 @@
-const DealerModel = require("../models/dealer.model");
 const LeadModel = require("../models/lead.model");
 const UserModel = require("../models/user.model");
 const { substratCoin, addCoin, isPositive } = require("../utils/balance.utils");
@@ -15,11 +14,12 @@ module.exports.createLead = async (req, res) => {
     !req.body.lookingFor ||
     !req.body.dealerID ||
     !req.body.sector ||
-    !req.body.region
+    !req.body.region ||
+    !req.body.skills
   ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
-    const dealer = await DealerModel.findById(req.body.dealerID);
+    const dealer = await UserModel.findById(req.body.dealerID);
     console.log(dealer.nb_lead);
     const newLead = await LeadModel.create({
       first_name: req.body.first_name,
@@ -31,10 +31,11 @@ module.exports.createLead = async (req, res) => {
       sector: req.body.sector,
       region: req.body.region,
       lookingFor: req.body.lookingFor,
+      skills: req.body.skills,
       dealerID: req.body.dealerID,
     });
 
-    const newNumberLead = await DealerModel.findByIdAndUpdate(
+    const newNumberLead = await UserModel.findByIdAndUpdate(
       req.body.dealerID,
       {
         $set: { nb_lead: dealer.nb_lead + 1 },
@@ -56,10 +57,13 @@ module.exports.editLead = async (req, res) => {
       first_name: req.body.first_name,
       last_name: req.body.last_name,
       email: req.body.email,
+      phone: req.body.phone,
       role: req.body.role,
       company: req.body.company,
       sector: req.body.company,
+      region: req.body.region,
       lookingFor: req.body.lookingFor,
+      skills: req.body.skills,
       role: req.body.role,
     },
     { new: true }
@@ -74,7 +78,7 @@ module.exports.buyLead = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   const user = await UserModel.findById(req.body.userID);
-  const dealer = await DealerModel.findById(req.body.dealerID);
+  const dealer = await UserModel.findById(req.body.dealerID);
 
   if (!isPositive(user.coin))
     return res.status(400).send("Coins balance : " + user.coin);
@@ -97,7 +101,7 @@ module.exports.buyLead = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const newUserBuyer = await DealerModel.findByIdAndUpdate(
+    const newUserBuyer = await UserModel.findByIdAndUpdate(
       req.body.dealerID,
       {
         $addToSet: { deal: req.params.id },
