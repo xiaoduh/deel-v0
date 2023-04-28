@@ -20,7 +20,6 @@ module.exports.createLead = async (req, res) => {
     res.status(400).json({ message: "requete incomplete" });
   } else {
     const dealer = await UserModel.findById(req.body.dealerID);
-    console.log(dealer.nb_lead);
     const newLead = await LeadModel.create({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
@@ -39,6 +38,7 @@ module.exports.createLead = async (req, res) => {
       req.body.dealerID,
       {
         $set: { nb_lead: dealer.nb_lead + 1 },
+        $push: { lead_sell: newLead._id },
       },
       { new: true, upsert: true }
     );

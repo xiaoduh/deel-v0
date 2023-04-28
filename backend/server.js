@@ -1,7 +1,6 @@
 const express = require("express");
 const connectDB = require("./config/db");
 const leadRoutes = require("./routes/lead.routes");
-const dealerRoutes = require("./routes/dealer.routes");
 const userRoutes = require("./routes/user.routes");
 const coinRoutes = require("./routes/coin.routes");
 const stripeRoutes = require("./routes/stripe.routes");
@@ -42,7 +41,6 @@ app.get("/jwtid", requireAuth, (req, res) => {
 
 // routes
 app.use("/api/lead", leadRoutes);
-app.use("/api/dealer", dealerRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);

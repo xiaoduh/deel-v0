@@ -1,4 +1,3 @@
-const { boolean } = require("joi");
 const mongoose = require("mongoose");
 
 const leadSchema = mongoose.Schema(
@@ -39,6 +38,10 @@ const leadSchema = mongoose.Schema(
     lookingFor: {
       type: String,
       required: true,
+    },
+    jobDesc: {
+      type: Boolean,
+      default: false,
     },
     skills: {
       type: String,
