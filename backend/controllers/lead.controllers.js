@@ -72,6 +72,19 @@ module.exports.editLead = async (req, res) => {
   return res.status(200).json(updateLead);
 };
 
+module.exports.removeLead = async (req, res) => {
+  if (!ObjectID.isValid(req.params.id))
+    return res.status(400).send("ID unknonw : " + req.params.id);
+
+  try {
+    await LeadModel.findOneAndRemove(req.params.id);
+    res.status(200).json({ message: "lead successfully deleted" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ error });
+  }
+};
+
 // probably to relocated in stripe controllers
 module.exports.buyLead = async (req, res) => {
   if (!ObjectID.isValid(req.params.id))
