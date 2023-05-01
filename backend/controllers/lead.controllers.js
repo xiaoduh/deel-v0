@@ -1,3 +1,4 @@
+const conversationModel = require("../models/conversation.model");
 const LeadModel = require("../models/lead.model");
 const UserModel = require("../models/user.model");
 const { substratCoin, addCoin, isPositive } = require("../utils/balance.utils");
@@ -126,8 +127,15 @@ module.exports.buyLead = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    if (newBuyer && newLead && newUserBuyer)
-      res.status(200).json(newBuyer, newLead, newUserBuyer);
+    const newConversation = await conversationModel.create({
+      leadID: req.body.leadID,
+      userID: req.body.userID,
+      dealerID: req.body.dealerID,
+    });
+
+    if (newBuyer && newLead && newUserBuyer && newConversation)
+      console.log(newConversation);
+    res.status(200).json(newConversation);
   } catch (error) {
     res.status(400).json(error);
   }

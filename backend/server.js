@@ -4,6 +4,7 @@ const leadRoutes = require("./routes/lead.routes");
 const userRoutes = require("./routes/user.routes");
 const coinRoutes = require("./routes/coin.routes");
 const stripeRoutes = require("./routes/stripe.routes");
+const conversationRoutes = require("./routes/conversation.routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { checkUser, requireAuth } = require("./middleware/auth.user.middleware");
@@ -44,6 +45,7 @@ app.use("/api/lead", leadRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/conversation", conversationRoutes);
 
 // Lancer le server
 const port = process.env.PORT || 5000;
