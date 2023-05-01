@@ -65,6 +65,9 @@ module.exports.editLead = async (req, res) => {
       lookingFor: req.body.lookingFor,
       skills: req.body.skills,
       role: req.body.role,
+      isOpen: req.body.isOpen,
+      isVerified: req.body.isVerified,
+      status: req.body.status,
     },
     { new: true }
   );
