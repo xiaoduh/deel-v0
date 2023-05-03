@@ -61,7 +61,7 @@ module.exports.editLead = async (req, res) => {
       phone: req.body.phone,
       role: req.body.role,
       company: req.body.company,
-      sector: req.body.company,
+      sector: req.body.sector,
       region: req.body.region,
       lookingFor: req.body.lookingFor,
       skills: req.body.skills,
