@@ -1,5 +1,4 @@
 const UserModel = require("../models/user.model");
-const DealerModel = require("../models/dealer.model");
 const jwt = require("jsonwebtoken");
 
 module.exports.checkUser = (req, res, next) => {
@@ -15,14 +14,8 @@ module.exports.checkUser = (req, res, next) => {
           next();
         } else {
           let user = await UserModel.findById(decodedToken.id);
-          if (user) {
-            res.locals.user = user;
-            console.log(user);
-          } else {
-            let dealer = await DealerModel.findById(decodedToken.id);
-            res.locals.dealer = dealer;
-            console.log(dealer);
-          }
+          if (user) res.locals.user = user;
+          console.log(user);
           next();
         }
       }
