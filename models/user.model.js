@@ -4,12 +4,9 @@ const bcrypt = require("bcrypt");
 
 const userSchema = mongoose.Schema(
   {
-    user_username: {
+    user_type: {
       type: String,
       required: true,
-      minlength: 3,
-      maxlength: 55,
-      unique: true,
       trim: true,
     },
     first_name: {
@@ -40,6 +37,7 @@ const userSchema = mongoose.Schema(
       max: 10,
       minlength: 10,
       unique: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -50,11 +48,27 @@ const userSchema = mongoose.Schema(
     lead_bought: {
       type: [String],
     },
+    nb_lead: {
+      type: Number,
+      default: 0,
+    },
     coin: {
       type: Number,
-      default: 2,
+    },
+    review: {
+      type: [Number],
     },
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isSales: {
+      type: Boolean,
+    },
+    isBusinessProvider: {
+      type: Boolean,
+    },
+    isAdmin: {
       type: Boolean,
       default: false,
     },

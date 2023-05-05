@@ -1,16 +1,18 @@
 const express = require("express");
 const connectDB = require("./config/db");
 const leadRoutes = require("./routes/lead.routes");
-const dealerRoutes = require("./routes/dealer.routes");
 const userRoutes = require("./routes/user.routes");
 const coinRoutes = require("./routes/coin.routes");
 const stripeRoutes = require("./routes/stripe.routes");
+const conversationRoutes = require("./routes/conversation.routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { checkUser, requireAuth } = require("./middleware/auth.user.middleware");
 const cors = require("cors");
 
 const app = express();
+
+// origin: "http://localhost:3000",
 
 const corsOptions = {
   origin: "https://app-deeel.netlify.app",
@@ -40,10 +42,10 @@ app.get("/jwtid", requireAuth, (req, res) => {
 
 // routes
 app.use("/api/lead", leadRoutes);
-app.use("/api/dealer", dealerRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/conversation", conversationRoutes);
 
 // Lancer le server
 const port = process.env.PORT || 5000;

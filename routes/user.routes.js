@@ -20,11 +20,8 @@ router.put(
 // user CRUD
 router.get("/:id", userController.getUniqueUser);
 router.get("/", userController.getAllUsers);
-// router.post("/", userController.createUser);
 router.put("/:id", userController.editUser);
-
-// router.patch("/lead-bought/:id", (req, res) => {
-//   res.json({ message: "Lead acheté :" + req.params.id });
-// });
+// route pour effectuer une demande de retrait
+router.put("/withdraw/:id", userController.convertCredit);
 
 module.exports = router;
