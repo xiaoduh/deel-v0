@@ -1,7 +1,7 @@
 const Stripe = require("stripe");
 const dotenv = require("dotenv").config();
 const stripe = Stripe(
-  "pk_live_51MmFnAAFkffstGEScgHou9CEY4fbTh8nu5nLW9D9CTVu7L3uk8CLmfK49N00i813C1Bd9Q8dMLFI1oTYepyzkFL800ydBeOcj1"
+  "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"
 );
 const UserModel = require("../models/user.model");
 const ObjectID = require("mongoose").Types.ObjectId;
