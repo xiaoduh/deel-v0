@@ -1,4 +1,4 @@
-const DealerModel = require("../models/dealer.model");
+const conversationModel = require("../models/conversation.model");
 const LeadModel = require("../models/lead.model");
 const UserModel = require("../models/user.model");
 const { substratCoin, addCoin, isPositive } = require("../utils/balance.utils");
@@ -15,11 +15,12 @@ module.exports.createLead = async (req, res) => {
     !req.body.lookingFor ||
     !req.body.dealerID ||
     !req.body.sector ||
-    !req.body.region
+    !req.body.region ||
+    !req.body.skills
   ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
-    const dealer = await DealerModel.findById(req.body.dealerID);
+    const dealer = await UserModel.findById(req.body.dealerID);
     const newLead = await LeadModel.create({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
@@ -30,13 +31,15 @@ module.exports.createLead = async (req, res) => {
       sector: req.body.sector,
       region: req.body.region,
       lookingFor: req.body.lookingFor,
+      skills: req.body.skills,
       dealerID: req.body.dealerID,
     });
 
-    const newNumberLead = await DealerModel.findByIdAndUpdate(
+    const newNumberLead = await UserModel.findByIdAndUpdate(
       req.body.dealerID,
       {
         $set: { nb_lead: dealer.nb_lead + 1 },
+        $push: { lead_sell: newLead._id },
       },
       { new: true, upsert: true }
     );
@@ -55,16 +58,37 @@ module.exports.editLead = async (req, res) => {
       first_name: req.body.first_name,
       last_name: req.body.last_name,
       email: req.body.email,
+      phone: req.body.phone,
       role: req.body.role,
       company: req.body.company,
-      sector: req.body.company,
+      sector: req.body.sector,
+      region: req.body.region,
       lookingFor: req.body.lookingFor,
+      skills: req.body.skills,
       role: req.body.role,
+      isOpen: req.body.isOpen,
+      isVerified: req.body.isVerified,
+      status: req.body.status,
     },
     { new: true }
   );
 
   return res.status(200).json(updateLead);
+};
+
+module.exports.removeLead = async (req, res) => {
+  if (!ObjectID.isValid(req.params.id))
+    return res.status(400).send("ID unknonw : " + req.params.id);
+
+  console.log(req.params.id);
+
+  try {
+    const leadRemoved = await LeadModel.findByIdAndRemove(req.params.id);
+    res.status(200).json(leadRemoved);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ error });
+  }
 };
 
 // probably to relocated in stripe controllers
@@ -73,7 +97,7 @@ module.exports.buyLead = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   const user = await UserModel.findById(req.body.userID);
-  const dealer = await DealerModel.findById(req.body.dealerID);
+  const dealer = await UserModel.findById(req.body.dealerID);
 
   if (!isPositive(user.coin))
     return res.status(400).send("Coins balance : " + user.coin);
@@ -96,7 +120,7 @@ module.exports.buyLead = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const newUserBuyer = await DealerModel.findByIdAndUpdate(
+    const newUserBuyer = await UserModel.findByIdAndUpdate(
       req.body.dealerID,
       {
         $addToSet: { deal: req.params.id },
@@ -105,8 +129,15 @@ module.exports.buyLead = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    if (newBuyer && newLead && newUserBuyer)
-      res.status(200).json(newBuyer, newLead, newUserBuyer);
+    const newConversation = await conversationModel.create({
+      leadID: req.body.leadID,
+      userID: req.body.userID,
+      dealerID: req.body.dealerID,
+    });
+
+    if (newBuyer && newLead && newUserBuyer && newConversation)
+      console.log(newConversation);
+    res.status(200).json(newConversation);
   } catch (error) {
     res.status(400).json(error);
   }

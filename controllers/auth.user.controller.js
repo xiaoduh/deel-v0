@@ -18,43 +18,87 @@ const createToken = (id) => {
   );
 };
 
-//creation du compte + envoi d'un lien de validation d'email
+//creation du compte + check de l'usertype + envoi d'un lien de validation d'email
 module.exports.signUpUser = async (req, res) => {
-  const {
-    user_username,
-    first_name,
-    last_name,
-    email,
-    phone_number,
-    password,
-  } = req.body;
+  const { user_type, first_name, last_name, email, phone_number, password } =
+    req.body;
 
   try {
-    const user = await UserModel.create({
-      user_username,
-      first_name,
-      last_name,
-      email,
-      phone_number,
-      password,
-    });
+    if (user_type == "sales") {
+      const user = await UserModel.create({
+        user_type,
+        first_name,
+        last_name,
+        email,
+        phone_number,
+        password,
+        coin: 2,
+        isSales: true,
+        isBusinessProvider: false,
+      });
 
-    const token = await new Token({
-      userId: user._id,
-      token: crypto.randomBytes(32).toString("hex"),
-    }).save();
+      const token = await new Token({
+        userId: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
 
-    const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
-    const text =
-      "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
-    await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+      const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
+      const text =
+        "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
+      await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
 
-    res
-      .status(201)
-      .json({ message: "An Email sent to your account please verify" });
+      res.status(201).json({ user });
+    } else if (user_type == "business_provider") {
+      const user = await UserModel.create({
+        user_type,
+        first_name,
+        last_name,
+        email,
+        phone_number,
+        password,
+        coin: 0,
+        isSales: false,
+        isBusinessProvider: true,
+      });
+
+      const token = await new Token({
+        userId: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+
+      const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
+      const text =
+        "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
+      await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+
+      res.status(201).json({ user });
+    } else {
+      const user = await UserModel.create({
+        user_type,
+        first_name,
+        last_name,
+        email,
+        phone_number,
+        password,
+        coin: 0,
+        isSales: true,
+        isBusinessProvider: true,
+      });
+
+      const token = await new Token({
+        userId: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+
+      const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
+      const text =
+        "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
+      await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+
+      res.status(201).json({ user });
+    }
   } catch (err) {
     let errors = {
-      user_username: "",
       first_name: "",
       last_name: "",
       email: "",
@@ -62,11 +106,7 @@ module.exports.signUpUser = async (req, res) => {
       password: "",
     };
 
-    if (
-      err.code === 11000 &&
-      Object.keys(err.keyValue)[0].includes("user_username")
-    )
-      errors.user_username = "Ton identifiant est déjà utilisé";
+    console.log(err);
 
     if (err.code === 11000 && Object.keys(err.keyValue)[0].includes("email"))
       errors.email = "Un compte existe déjà avec cet email";
@@ -159,12 +199,7 @@ module.exports.signInUser = async (req, res) => {
   try {
     const user = await UserModel.login(email, password);
     const token = createToken(user._id);
-    res.cookie("jwt", token, {
-      httpOnly: true,
-      maxAge: maxAge,
-      sameSite: "none",
-      secure: true,
-    });
+    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge });
     res.status(200).json({ user: user._id });
   } catch (err) {
     let errors = { email: "", password: "" };
