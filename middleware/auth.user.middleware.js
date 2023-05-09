@@ -37,6 +37,8 @@ module.exports.requireAuth = (req, res, next) => {
           console.log(error);
         } else {
           console.log(decodedToken.id);
+          let user = await UserModel.findById(decodedToken.id);
+          if (user) res.locals.user = user;
           next();
         }
       }
