@@ -203,7 +203,7 @@ module.exports.signInUser = async (req, res) => {
       httpOnly: true,
       // secure: true,
       maxAge: maxAge,
-      sameSite: None,
+      sameSite: false,
     });
     res.status(200).json({ user: user._id, token: token });
   } catch (err) {
