@@ -45,7 +45,7 @@ module.exports.signUpUser = async (req, res) => {
       const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
       const text =
         "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
-      await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+      // await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
 
       res.status(201).json({ user });
     } else if (user_type == "business_provider") {
@@ -69,7 +69,7 @@ module.exports.signUpUser = async (req, res) => {
       const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
       const text =
         "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
-      await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+      // await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
 
       res.status(201).json({ user });
     } else {
@@ -93,7 +93,7 @@ module.exports.signUpUser = async (req, res) => {
       const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
       const text =
         "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
-      await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+      // await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
 
       res.status(201).json({ user });
     }
