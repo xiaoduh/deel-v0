@@ -15,6 +15,7 @@ const app = express();
 // origin: "http://localhost:3000",
 
 const corsOptions = {
+  AccessControlAllowOrigin: "https://app-deeel.netlify.app",
   origin: "https://app-deeel.netlify.app",
   credentials: true,
   allowedHeaders: ["sessionId", "Content-Type"],
