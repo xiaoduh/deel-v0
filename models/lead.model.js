@@ -29,7 +29,6 @@ const leadSchema = mongoose.Schema(
     },
     sector: {
       type: String,
-      required: true,
     },
     region: {
       type: String,
@@ -60,6 +59,10 @@ const leadSchema = mongoose.Schema(
     status: {
       type: String,
       default: "pending",
+    },
+    provider: {
+      type: String,
+      required: true,
     },
   },
   {

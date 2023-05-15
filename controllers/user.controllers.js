@@ -47,7 +47,7 @@ module.exports.convertCredit = async (req, res) => {
     const user = await UserModel.findByIdAndUpdate(
       req.params.id,
       {
-        $set: { coin: userToWithdrawCredit.coin - withdraw },
+        $set: { solde: userToWithdrawCredit.solde - withdraw },
       },
       { new: true, upsert: true }
     );

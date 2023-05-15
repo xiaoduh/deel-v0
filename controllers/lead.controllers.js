@@ -14,9 +14,9 @@ module.exports.createLead = async (req, res) => {
     !req.body.company ||
     !req.body.lookingFor ||
     !req.body.dealerID ||
-    !req.body.sector ||
     !req.body.region ||
-    !req.body.skills
+    !req.body.skills ||
+    !req.body.provider
   ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
@@ -32,19 +32,33 @@ module.exports.createLead = async (req, res) => {
       region: req.body.region,
       lookingFor: req.body.lookingFor,
       skills: req.body.skills,
+      provider: req.body.provider,
       dealerID: req.body.dealerID,
     });
 
-    const newNumberLead = await UserModel.findByIdAndUpdate(
-      req.body.dealerID,
-      {
-        $set: { nb_lead: dealer.nb_lead + 1 },
-        $push: { lead_sell: newLead._id },
-      },
-      { new: true, upsert: true }
-    );
+    if (req.body.provider === "esn") {
+      const newNumberLead = await UserModel.findByIdAndUpdate(
+        req.body.dealerID,
+        {
+          $set: { nb_lead: dealer.nb_lead + 1 },
+          $set: { solde: dealer.solde + 15 },
+          $push: { lead_sell: newLead._id },
+        },
+        { new: true, upsert: true }
+      );
+    } else {
+      const newNumberLead = await UserModel.findByIdAndUpdate(
+        req.body.dealerID,
+        {
+          $set: { nb_lead: dealer.nb_lead + 1 },
+          $set: { solde: dealer.solde + 60 },
+          $push: { lead_sell: newLead._id },
+        },
+        { new: true, upsert: true }
+      );
+    }
 
-    if (newLead && newNumberLead) res.status(200).json(newLead);
+    res.status(200).json(newLead);
   }
 };
 
@@ -120,14 +134,14 @@ module.exports.buyLead = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const newUserBuyer = await UserModel.findByIdAndUpdate(
-      req.body.dealerID,
-      {
-        $addToSet: { deal: req.params.id },
-        $set: { coin: addCoin(dealer.coin) },
-      },
-      { new: true, upsert: true }
-    );
+    // const newUserBuyer = await UserModel.findByIdAndUpdate(
+    //   req.body.dealerID,
+    //   {
+    //     $addToSet: { deal: req.params.id },
+    //     $set: { coin: addCoin(dealer.coin) },
+    //   },
+    //   { new: true, upsert: true }
+    // );
 
     const newConversation = await conversationModel.create({
       leadID: req.body.leadID,
@@ -135,8 +149,6 @@ module.exports.buyLead = async (req, res) => {
       dealerID: req.body.dealerID,
     });
 
-    if (newBuyer && newLead && newUserBuyer && newConversation)
-      console.log(newConversation);
     res.status(200).json(newConversation);
   } catch (error) {
     res.status(400).json(error);
