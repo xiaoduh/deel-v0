@@ -32,7 +32,6 @@ module.exports.signUpUser = async (req, res) => {
         email,
         phone_number,
         password,
-        coin: 2,
         isSales: true,
         isBusinessProvider: false,
       });
