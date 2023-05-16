@@ -16,11 +16,12 @@ module.exports.createLead = async (req, res) => {
     !req.body.dealerID ||
     !req.body.region ||
     !req.body.skills ||
-    !req.body.provider
+    !req.body.provider ||
+    !req.body.desc
   ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
-    const dealer = await UserModel.findById(req.body.dealerID);
+    // const dealer = await UserModel.findById(req.body.dealerID);
     const newLead = await LeadModel.create({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
@@ -32,31 +33,32 @@ module.exports.createLead = async (req, res) => {
       region: req.body.region,
       lookingFor: req.body.lookingFor,
       skills: req.body.skills,
+      desc: req.body.desc,
       provider: req.body.provider,
       dealerID: req.body.dealerID,
     });
 
-    if (req.body.provider === "esn") {
-      const newNumberLead = await UserModel.findByIdAndUpdate(
-        req.body.dealerID,
-        {
-          $set: { nb_lead: dealer.nb_lead + 1 },
-          $set: { solde: dealer.solde + 5 },
-          $push: { lead_sell: newLead._id },
-        },
-        { new: true, upsert: true }
-      );
-    } else {
-      const newNumberLead = await UserModel.findByIdAndUpdate(
-        req.body.dealerID,
-        {
-          $set: { nb_lead: dealer.nb_lead + 1 },
-          $set: { solde: dealer.solde + 60 },
-          $push: { lead_sell: newLead._id },
-        },
-        { new: true, upsert: true }
-      );
-    }
+    // if (req.body.first_name && req.body.last_name) {
+    //   if (req.body.provider === "esn") {
+    //     const newNumberLead = await UserModel.findByIdAndUpdate(
+    //       req.body.dealerID,
+    //       {
+    //         $set: { nb_lead: dealer.nb_lead + 1 },
+    //         $set: { solde: dealer.solde + 15 },
+    //       },
+    //       { new: true, upsert: true }
+    //     );
+    //   } else {
+    //     const newNumberLead = await UserModel.findByIdAndUpdate(
+    //       req.body.dealerID,
+    //       {
+    //         $set: { nb_lead: dealer.nb_lead + 1 },
+    //         $set: { solde: dealer.solde + 60 },
+    //       },
+    //       { new: true, upsert: true }
+    //     );
+    //   }
+    // }
 
     res.status(200).json(newLead);
   }
@@ -86,6 +88,18 @@ module.exports.editLead = async (req, res) => {
     },
     { new: true }
   );
+
+  if (updateLead.status === "validated") {
+    const user = await UserModel.findById(updateLead.dealerID);
+
+    const editUser = await UserModel.findByIdAndUpdate(
+      user._id,
+      {
+        $set: { solde: user.solde + 100 },
+      },
+      { new: true, upsert: true }
+    );
+  }
 
   return res.status(200).json(updateLead);
 };
