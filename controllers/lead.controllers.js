@@ -41,7 +41,7 @@ module.exports.createLead = async (req, res) => {
         req.body.dealerID,
         {
           $set: { nb_lead: dealer.nb_lead + 1 },
-          $set: { solde: dealer.solde + 15 },
+          $set: { solde: dealer.solde + 5 },
           $push: { lead_sell: newLead._id },
         },
         { new: true, upsert: true }
