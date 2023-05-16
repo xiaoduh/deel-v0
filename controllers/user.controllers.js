@@ -52,13 +52,8 @@ module.exports.convertCredit = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const text = `Bonjour, vous avez une nouvelle demande de retrait. Utilisateur n° : ${user._id} d'un montant de ${withdraw}`;
-    await sendEmail(
-      "therealbigdeeel@gmail.com",
-      "deeel.fr - Nouveau retrait",
-      text,
-      " crédits"
-    );
+    const text = `Bonjour, vous avez une nouvelle demande de retrait. Utilisateur n° : ${user._id} ${user.first_name} d'un montant de ${withdraw} €`;
+    await sendEmail("hello@deeel.fr", "deeel.fr - Nouveau retrait", text);
 
     res.status(200).json({
       message: "withdraw successfull",
