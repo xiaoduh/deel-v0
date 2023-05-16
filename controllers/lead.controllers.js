@@ -91,14 +91,23 @@ module.exports.editLead = async (req, res) => {
 
   if (updateLead.status === "validated") {
     const user = await UserModel.findById(updateLead.dealerID);
-
-    const editUser = await UserModel.findByIdAndUpdate(
-      user._id,
-      {
-        $set: { solde: user.solde + 100 },
-      },
-      { new: true, upsert: true }
-    );
+    if (updateLead.provider === "esn") {
+      const editUser = await UserModel.findByIdAndUpdate(
+        user._id,
+        {
+          $set: { solde: user.solde + 5 },
+        },
+        { new: true, upsert: true }
+      );
+    } else {
+      const editUser = await UserModel.findByIdAndUpdate(
+        user._id,
+        {
+          $set: { solde: user.solde + 60 },
+        },
+        { new: true, upsert: true }
+      );
+    }
   }
 
   return res.status(200).json(updateLead);
