@@ -1,7 +1,7 @@
 const conversationModel = require("../models/conversation.model");
 const LeadModel = require("../models/lead.model");
 const UserModel = require("../models/user.model");
-const { substratCoin, addCoin, isPositive } = require("../utils/balance.utils");
+const { substratCoin, isPositive } = require("../utils/balance.utils");
 const ObjectID = require("mongoose").Types.ObjectId;
 
 module.exports.getLeads = async (req, res) => {
@@ -17,7 +17,8 @@ module.exports.createLead = async (req, res) => {
     !req.body.region ||
     !req.body.skills ||
     !req.body.provider ||
-    !req.body.desc
+    !req.body.desc ||
+    !req.body.price
   ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
@@ -29,13 +30,13 @@ module.exports.createLead = async (req, res) => {
       phone: req.body.phone,
       role: req.body.role,
       company: req.body.company,
-      sector: req.body.sector,
       region: req.body.region,
       lookingFor: req.body.lookingFor,
       skills: req.body.skills,
       desc: req.body.desc,
       provider: req.body.provider,
       dealerID: req.body.dealerID,
+      price: req.body.price,
     });
 
     // if (req.body.first_name && req.body.last_name) {
@@ -85,29 +86,21 @@ module.exports.editLead = async (req, res) => {
       isOpen: req.body.isOpen,
       isVerified: req.body.isVerified,
       status: req.body.status,
+      price: req.body.price,
     },
     { new: true }
   );
 
   if (updateLead.status === "validated") {
     const user = await UserModel.findById(updateLead.dealerID);
-    if (updateLead.provider === "esn") {
-      const editUser = await UserModel.findByIdAndUpdate(
-        user._id,
-        {
-          $set: { solde: user.solde + 5 },
-        },
-        { new: true, upsert: true }
-      );
-    } else {
-      const editUser = await UserModel.findByIdAndUpdate(
-        user._id,
-        {
-          $set: { solde: user.solde + 60 },
-        },
-        { new: true, upsert: true }
-      );
-    }
+
+    const editUser = await UserModel.findByIdAndUpdate(
+      user._id,
+      {
+        $set: { solde: user.solde + 100 },
+      },
+      { new: true, upsert: true }
+    );
   }
 
   return res.status(200).json(updateLead);
@@ -135,6 +128,7 @@ module.exports.buyLead = async (req, res) => {
 
   const user = await UserModel.findById(req.body.userID);
   const dealer = await UserModel.findById(req.body.dealerID);
+  const lead = await LeadModel.findById(req.params.id);
 
   if (!isPositive(user.coin))
     return res.status(400).send("Coins balance : " + user.coin);
@@ -152,26 +146,24 @@ module.exports.buyLead = async (req, res) => {
       req.body.userID,
       {
         $addToSet: { lead_bought: req.params.id },
-        $set: { coin: substratCoin(user.coin) },
+        $set: { coin: substratCoin(user.coin, newBuyer) },
       },
       { new: true, upsert: true }
     );
 
-    // const newUserBuyer = await UserModel.findByIdAndUpdate(
-    //   req.body.dealerID,
-    //   {
-    //     $addToSet: { deal: req.params.id },
-    //     $set: { coin: addCoin(dealer.coin) },
-    //   },
-    //   { new: true, upsert: true }
-    // );
+    const addGainToDealer = await UserModel.findByIdAndUpdate(
+      req.body.dealerID,
+      {
+        $set: { solde: lead.price },
+      },
+      { new: true, upsert: true }
+    );
 
     const newConversation = await conversationModel.create({
       leadID: req.body.leadID,
       userID: req.body.userID,
       dealerID: req.body.dealerID,
     });
-
     res.status(200).json(newConversation);
   } catch (error) {
     res.status(400).json(error);

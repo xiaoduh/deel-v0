@@ -3,12 +3,12 @@ module.exports.addCoin = (currentBalanceCoin) => {
   return newBalanceCoin;
 };
 
-module.exports.substratCoin = (currentBalanceCoin) => {
-  let newBalanceCoin = +currentBalanceCoin - 1;
+module.exports.substratCoin = (currentBalanceCoin, lead) => {
+  let newBalanceCoin = parseFloat(currentBalanceCoin) - parseFloat(lead.price);
   return newBalanceCoin;
 };
 
 module.exports.isPositive = (currentBalanceCoin) => {
-  if (currentBalanceCoin > 0) return true;
+  if (parseFloat(currentBalanceCoin) > 0) return true;
   else return false;
 };
