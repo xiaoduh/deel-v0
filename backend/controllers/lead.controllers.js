@@ -146,7 +146,7 @@ module.exports.buyLead = async (req, res) => {
       req.body.userID,
       {
         $addToSet: { lead_bought: req.params.id },
-        $set: { coin: substratCoin(user.coin, newBuyer) },
+        $set: { coin: substratCoin(user.coin, lead) },
       },
       { new: true, upsert: true }
     );
@@ -154,10 +154,14 @@ module.exports.buyLead = async (req, res) => {
     const addGainToDealer = await UserModel.findByIdAndUpdate(
       req.body.dealerID,
       {
-        $set: { solde: ddCoin(dealer.solde, lead.price) },
+        $set: {
+          solde: parseFloat(dealer.solde) + parseFloat(lead.price),
+        },
       },
       { new: true, upsert: true }
     );
+
+    console.log(addGainToDealer);
 
     const newConversation = await conversationModel.create({
       leadID: req.body.leadID,

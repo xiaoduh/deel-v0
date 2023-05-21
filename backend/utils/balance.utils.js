@@ -1,5 +1,5 @@
-module.exports.addCoin = (currentSolde, price) => {
-  let newSolde = parseFloat(currentSolde) + parseFloat(price);
+module.exports.addCoin = (currentSolde, lead) => {
+  let newSolde = parseFloat(currentSolde) + parseFloat(lead.price);
   return newSolde;
 };
 
