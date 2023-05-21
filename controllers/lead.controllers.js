@@ -154,7 +154,7 @@ module.exports.buyLead = async (req, res) => {
     const addGainToDealer = await UserModel.findByIdAndUpdate(
       req.body.dealerID,
       {
-        $set: { solde: addCoin(dealer.solde, lead.price) },
+        $set: { solde: addCoin(dealer.solde, lead) },
       },
       { new: true, upsert: true }
     );
