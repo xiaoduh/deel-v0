@@ -46,6 +46,10 @@ const leadSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    desc: {
+      type: String,
+      required: true,
+    },
     role: {
       type: String,
     },
@@ -61,6 +65,10 @@ const leadSchema = mongoose.Schema(
       default: "pending",
     },
     provider: {
+      type: String,
+      required: true,
+    },
+    price: {
       type: String,
       required: true,
     },

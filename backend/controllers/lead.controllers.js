@@ -1,7 +1,7 @@
 const conversationModel = require("../models/conversation.model");
 const LeadModel = require("../models/lead.model");
 const UserModel = require("../models/user.model");
-const { substratCoin, addCoin, isPositive } = require("../utils/balance.utils");
+const { substratCoin, isPositive } = require("../utils/balance.utils");
 const ObjectID = require("mongoose").Types.ObjectId;
 
 module.exports.getLeads = async (req, res) => {
@@ -16,11 +16,13 @@ module.exports.createLead = async (req, res) => {
     !req.body.dealerID ||
     !req.body.region ||
     !req.body.skills ||
-    !req.body.provider
+    !req.body.provider ||
+    !req.body.desc ||
+    !req.body.price
   ) {
     res.status(400).json({ message: "requete incomplete" });
   } else {
-    const dealer = await UserModel.findById(req.body.dealerID);
+    // const dealer = await UserModel.findById(req.body.dealerID);
     const newLead = await LeadModel.create({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
@@ -31,31 +33,33 @@ module.exports.createLead = async (req, res) => {
       region: req.body.region,
       lookingFor: req.body.lookingFor,
       skills: req.body.skills,
+      desc: req.body.desc,
       provider: req.body.provider,
       dealerID: req.body.dealerID,
+      price: req.body.price,
     });
 
-    if (req.body.provider === "esn") {
-      const newNumberLead = await UserModel.findByIdAndUpdate(
-        req.body.dealerID,
-        {
-          $set: { nb_lead: dealer.nb_lead + 1 },
-          $set: { solde: dealer.solde + 15 },
-          $push: { lead_sell: newLead._id },
-        },
-        { new: true, upsert: true }
-      );
-    } else {
-      const newNumberLead = await UserModel.findByIdAndUpdate(
-        req.body.dealerID,
-        {
-          $set: { nb_lead: dealer.nb_lead + 1 },
-          $set: { solde: dealer.solde + 60 },
-          $push: { lead_sell: newLead._id },
-        },
-        { new: true, upsert: true }
-      );
-    }
+    // if (req.body.first_name && req.body.last_name) {
+    //   if (req.body.provider === "esn") {
+    //     const newNumberLead = await UserModel.findByIdAndUpdate(
+    //       req.body.dealerID,
+    //       {
+    //         $set: { nb_lead: dealer.nb_lead + 1 },
+    //         $set: { solde: dealer.solde + 15 },
+    //       },
+    //       { new: true, upsert: true }
+    //     );
+    //   } else {
+    //     const newNumberLead = await UserModel.findByIdAndUpdate(
+    //       req.body.dealerID,
+    //       {
+    //         $set: { nb_lead: dealer.nb_lead + 1 },
+    //         $set: { solde: dealer.solde + 60 },
+    //       },
+    //       { new: true, upsert: true }
+    //     );
+    //   }
+    // }
 
     res.status(200).json(newLead);
   }
@@ -82,9 +86,22 @@ module.exports.editLead = async (req, res) => {
       isOpen: req.body.isOpen,
       isVerified: req.body.isVerified,
       status: req.body.status,
+      price: req.body.price,
     },
     { new: true }
   );
+
+  if (updateLead.status === "validated") {
+    const user = await UserModel.findById(updateLead.dealerID);
+
+    const editUser = await UserModel.findByIdAndUpdate(
+      user._id,
+      {
+        $set: { solde: user.solde + 100 },
+      },
+      { new: true, upsert: true }
+    );
+  }
 
   return res.status(200).json(updateLead);
 };
@@ -111,12 +128,13 @@ module.exports.buyLead = async (req, res) => {
 
   const user = await UserModel.findById(req.body.userID);
   const dealer = await UserModel.findById(req.body.dealerID);
+  const lead = await LeadModel.findById(req.params.id);
 
   if (!isPositive(user.coin))
     return res.status(400).send("Coins balance : " + user.coin);
 
   try {
-    const newBuyer = await LeadModel.findByIdAndUpdate(
+    const addBuyerToLead = await LeadModel.findByIdAndUpdate(
       req.params.id,
       {
         $addToSet: { buyer: req.body.userID },
@@ -124,23 +142,22 @@ module.exports.buyLead = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const newLead = await UserModel.findByIdAndUpdate(
+    const subPriceToBuyer = await UserModel.findByIdAndUpdate(
       req.body.userID,
       {
         $addToSet: { lead_bought: req.params.id },
-        $set: { coin: substratCoin(user.coin) },
+        $set: { coin: substratCoin(user.coin, newBuyer) },
       },
       { new: true, upsert: true }
     );
 
-    // const newUserBuyer = await UserModel.findByIdAndUpdate(
-    //   req.body.dealerID,
-    //   {
-    //     $addToSet: { deal: req.params.id },
-    //     $set: { coin: addCoin(dealer.coin) },
-    //   },
-    //   { new: true, upsert: true }
-    // );
+    const addGainToDealer = await UserModel.findByIdAndUpdate(
+      req.body.dealerID,
+      {
+        $set: { solde: ddCoin(dealer.solde, lead.price) },
+      },
+      { new: true, upsert: true }
+    );
 
     const newConversation = await conversationModel.create({
       leadID: req.body.leadID,

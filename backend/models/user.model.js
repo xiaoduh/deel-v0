@@ -53,11 +53,11 @@ const userSchema = mongoose.Schema(
       default: 0,
     },
     coin: {
-      type: Number,
-      default: 2,
+      type: String,
+      default: 0,
     },
     solde: {
-      type: Number,
+      type: String,
       default: 0,
     },
     review: {
