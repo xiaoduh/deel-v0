@@ -1,6 +1,6 @@
-module.exports.addCoin = (currentBalanceCoin) => {
-  let newBalanceCoin = +currentBalanceCoin + 1;
-  return newBalanceCoin;
+module.exports.addCoin = (currentSolde, price) => {
+  let newSolde = parseFloat(currentSolde) - parseFloat(price);
+  return newSolde;
 };
 
 module.exports.substratCoin = (currentBalanceCoin, lead) => {

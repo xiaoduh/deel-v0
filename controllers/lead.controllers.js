@@ -134,7 +134,7 @@ module.exports.buyLead = async (req, res) => {
     return res.status(400).send("Coins balance : " + user.coin);
 
   try {
-    const newBuyer = await LeadModel.findByIdAndUpdate(
+    const addBuyerToLead = await LeadModel.findByIdAndUpdate(
       req.params.id,
       {
         $addToSet: { buyer: req.body.userID },
@@ -142,7 +142,7 @@ module.exports.buyLead = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const newLead = await UserModel.findByIdAndUpdate(
+    const subPriceToBuyer = await UserModel.findByIdAndUpdate(
       req.body.userID,
       {
         $addToSet: { lead_bought: req.params.id },
@@ -154,7 +154,7 @@ module.exports.buyLead = async (req, res) => {
     const addGainToDealer = await UserModel.findByIdAndUpdate(
       req.body.dealerID,
       {
-        $set: { solde: lead.price },
+        $set: { solde: addCoin(dealer.solde, lead.price) },
       },
       { new: true, upsert: true }
     );
