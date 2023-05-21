@@ -27,7 +27,7 @@ module.exports.payment = async (req, res) => {
     const user = await UserModel.findByIdAndUpdate(
       req.params.id,
       {
-        $set: { coin: userToAddCredit.coin + newCredit },
+        $set: { coin: parseFloat(userToAddCredit.coin) + newCredit },
       },
       { new: true, upsert: true }
     );
