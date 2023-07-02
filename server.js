@@ -1,11 +1,11 @@
 const express = require("express");
 const connectDB = require("./config/db");
-const leadRoutes = require("./routes/lead.routes");
 const userRoutes = require("./routes/user.routes");
-const coinRoutes = require("./routes/coin.routes");
 const stripeRoutes = require("./routes/stripe.routes");
-const conversationRoutes = require("./routes/conversation.routes");
 const messageRoutes = require("./routes/message.routes");
+const annonceRoutes = require("./routes/annonce.routes");
+const roomRoutes = require("./routes/room.routes");
+const offerRoutes = require("./routes/offer.routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { checkUser, requireAuth } = require("./middleware/auth.user.middleware");
@@ -16,14 +16,16 @@ const jwtSecret =
   "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5ceyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
 const UserModel = require("./models/user.model");
 const MessageModel = require("./models/message.model");
+const OfferModel = require("./models/offer.model");
+const sendEmail = require("./utils/sendEmail.utils");
 
 const app = express();
 
 // origin: "http://localhost:3000",
 
 const corsOptions = {
-  AccessControlAllowOrigin: "https://app-deeel.netlify.app",
-  origin: "https://app-deeel.netlify.app",
+  AccessControlAllowOrigin: "http://deeel-app.com/",
+  origin: "http://deeel-app.com/",
   credentials: true,
   allowedHeaders: ["sessionId", "Content-Type"],
   exposedHeaders: ["sessionId"],
@@ -55,6 +57,9 @@ app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
 app.use("/api/conversation", conversationRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/api/annonce", annonceRoutes);
+app.use("/api/room", roomRoutes);
+app.use("/api/offer", offerRoutes);
 
 // Lancer le server
 const port = process.env.PORT || 5000;
@@ -105,7 +110,7 @@ wss.on("connection", (connection, req) => {
       msgData.message.sender
     ) {
       const messageDoc = await MessageModel.create({
-        convID: msgData.message.convId,
+        roomID: msgData.message.uniqueRoomID,
         senderID: msgData.message.sender,
         recipientID: msgData.message.recipient,
         text: msgData.message.text,
@@ -115,7 +120,7 @@ wss.on("connection", (connection, req) => {
         .forEach((c) =>
           c.send(
             JSON.stringify({
-              convID: msgData.message.convId,
+              roomID: msgData.message.uniqueRoomID,
               senderID: msgData.message.sender,
               recipientID: msgData.message.recipient,
               text: msgData.message.text,
@@ -123,6 +128,65 @@ wss.on("connection", (connection, req) => {
             })
           )
         );
+    } else if (msgData.message.price) {
+      const user = await UserModel.findById(msgData.message.recipientID);
+      const offerDoc = await OfferModel.findOneAndUpdate(
+        {
+          uniqueRoomID: msgData.message.uniqueRoomID,
+        },
+        { $set: { price: msgData.message.price } }
+      );
+
+      const url2 = "www.google.com";
+      const text = `Bonjour ${user.pseudo}, vous venez de recevoir une offre d'un informateur. Connectez-vous pour accepter ou refuser l'offre. Cordialement, deeel `;
+
+      await sendEmail(
+        user.email,
+        "Un informateur vous fait une offre - deeel",
+        text,
+        url2
+      );
+
+      if (offerDoc !== null) {
+        [...wss.clients]
+          .filter((c) => c.userId === offerDoc.recipientID)
+          .forEach((c) =>
+            c.send(
+              JSON.stringify({
+                uniqueRoomID: offerDoc.uniqueRoomID,
+                annonceID: offerDoc.annonceID,
+                recipientID: offerDoc.recipientID,
+                userID: offerDoc.userID,
+                price: offerDoc.price,
+                _id: offerDoc._id,
+              })
+            )
+          );
+      }
+      if (offerDoc === null) {
+        const offerDoc = await OfferModel.create({
+          uniqueRoomID: msgData.message.uniqueRoomID,
+          annonceID: msgData.message.annonceID,
+          recipientID: msgData.message.recipientID,
+          userID: msgData.message.userID,
+          price: msgData.message.price,
+        });
+        console.log({ create: offerDoc });
+        [...wss.clients]
+          .filter((c) => c.userId === offerDoc.recipientID)
+          .forEach((c) =>
+            c.send(
+              JSON.stringify({
+                uniqueRoomID: offerDoc.uniqueRoomID,
+                annonceID: offerDoc.annonceID,
+                recipientID: offerDoc.recipientID,
+                userID: offerDoc.userID,
+                price: offerDoc.price,
+                _id: offerDoc._id,
+              })
+            )
+          );
+      }
     }
   });
 });

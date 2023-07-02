@@ -9,16 +9,19 @@ const userSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    first_name: {
+    pseudo: {
       type: String,
       required: true,
+      trim: true,
+    },
+    first_name: {
+      type: String,
       minlength: 3,
       maxlength: 55,
       trim: true,
     },
     last_name: {
       type: String,
-      required: true,
       minlength: 3,
       maxlength: 55,
       trim: true,
@@ -45,17 +48,6 @@ const userSchema = mongoose.Schema(
       max: 1024,
       minlength: 6,
     },
-    lead_bought: {
-      type: [String],
-    },
-    nb_lead: {
-      type: Number,
-      default: 0,
-    },
-    coin: {
-      type: String,
-      default: 0,
-    },
     solde: {
       type: String,
       default: 0,
@@ -80,6 +72,14 @@ const userSchema = mongoose.Schema(
     twoFA: {
       type: Boolean,
       default: false,
+    },
+    nb_annonce: {
+      type: Number,
+      default: 0,
+    },
+    nb_response_annonce: {
+      type: Number,
+      default: 0,
     },
   },
   {

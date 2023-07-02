@@ -1,4 +1,4 @@
-const ConversationModel = require("../models/conversation.model");
+const RoomModel = require("../models/room.model");
 const MessageModel = require("../models/message.model");
 
 module.exports.postMsg = async (req, res) => {
@@ -18,9 +18,8 @@ module.exports.postMsg = async (req, res) => {
 module.exports.getMsg = async (req, res) => {
   try {
     const { id } = req.params;
-    const conv = await ConversationModel.findById(id);
     const messages = await MessageModel.find({
-      convID: { $in: [conv._id] },
+      roomID: { $in: [id] },
     });
     res.status(200).json(messages);
   } catch (error) {

@@ -20,15 +20,13 @@ const createToken = (id) => {
 
 //creation du compte + check de l'usertype + envoi d'un lien de validation d'email
 module.exports.signUpUser = async (req, res) => {
-  const { user_type, first_name, last_name, email, phone_number, password } =
-    req.body;
+  const { user_type, pseudo, email, phone_number, password } = req.body;
 
   try {
     if (user_type == "sales") {
       const user = await UserModel.create({
         user_type,
-        first_name,
-        last_name,
+        pseudo,
         email,
         phone_number,
         password,
@@ -41,17 +39,20 @@ module.exports.signUpUser = async (req, res) => {
         token: crypto.randomBytes(32).toString("hex"),
       }).save();
 
-      const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
-      const text =
-        "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
-      // await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+      const url2 = "http://deeel-app.com/";
+      const text = `Bonjour ${user.pseudo}, bienvenue sur deeel. Votre compte a bien été créé. Vous pouvez dès maintenant trouver les informations qu'ils vous manquent et débrider votre business. Cordialement, deeel `;
+      await sendEmail(
+        user.email,
+        "Félicitations ! Votre compte est créé - deeel",
+        text,
+        url2
+      );
 
       res.status(201).json({ user });
     } else if (user_type == "business_provider") {
       const user = await UserModel.create({
         user_type,
-        first_name,
-        last_name,
+        pseudo,
         email,
         phone_number,
         password,
@@ -64,17 +65,20 @@ module.exports.signUpUser = async (req, res) => {
         token: crypto.randomBytes(32).toString("hex"),
       }).save();
 
-      const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
-      const text =
-        "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
-      // await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+      const url2 = "http://deeel-app.com/";
+      const text = `Bonjour ${user.pseudo}, bienvenue sur deeel. Votre compte a bien été créé. Vous pouvez dès maintenant monétiser vos informations en répondant aux annonceurs. Cordialement, deeel `;
+      await sendEmail(
+        user.email,
+        "Félicitations ! Votre compte est créé - deeel",
+        text,
+        url2
+      );
 
       res.status(201).json({ user });
     } else {
       const user = await UserModel.create({
         user_type,
-        first_name,
-        last_name,
+        pseudo,
         email,
         phone_number,
         password,
@@ -87,17 +91,15 @@ module.exports.signUpUser = async (req, res) => {
         token: crypto.randomBytes(32).toString("hex"),
       }).save();
 
-      const url = `https://deeel-v0-test.onrender.com/api/user/${user._id}/verify/${token.token}`;
       const text =
         "Bonjour, merci de suivre le lien ci après pour valider votre compte : ";
-      // await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
+      await sendEmail(user.email, "deeel.fr - Validez votre Email", text, url);
 
       res.status(201).json({ user });
     }
   } catch (err) {
     let errors = {
-      first_name: "",
-      last_name: "",
+      pseudo: "",
       email: "",
       phone_number: "",
       password: "",
@@ -109,17 +111,13 @@ module.exports.signUpUser = async (req, res) => {
       errors.email = "Un compte existe déjà avec cet email";
 
     if (err.message.includes("password"))
-      errors.password =
-        "Ton password est trop court, il doit faire 6 caractères minimum";
+      errors.password = "Votre mot de passe doit faire 6 caractères minimum";
 
     if (err.message.includes("phone_number"))
-      errors.phone_number = "Ton téléphone n'est pas renseigné";
+      errors.phone_number = "Veuillez renseigner un numéro de téléphone";
 
-    if (err.message.includes("first_name"))
-      errors.first_name = "Ton prénom n'est pas renseigné";
-
-    if (err.message.includes("last_name"))
-      errors.last_name = "Ton nom n'est pas renseigné";
+    if (err.message.includes("pseudo"))
+      errors.first_name = "Veuillez renseigner un pseudo";
 
     res.status(200).json({ errors });
   }
@@ -196,14 +194,8 @@ module.exports.signInUser = async (req, res) => {
   try {
     const user = await UserModel.login(email, password);
     const token = createToken(user._id);
-    res.cookie("jwt", token, {
-      httpOnly: true,
-      maxAge: maxAge,
-      secure: true,
-      httpOnly: true,
-      sameSite: "none",
-    });
-    res.status(200).json({ user: user._id, token: token });
+    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge });
+    res.status(200).json({ user: user._id });
   } catch (err) {
     let errors = { email: "", password: "" };
 
@@ -255,7 +247,7 @@ module.exports.userForgotPassword = async (req, res) => {
       }).save();
     }
 
-    const link = `https://app-deeel.netlify.app/api/user/user-reset-password/${user._id}/${token.token}`;
+    const link = `http://deeel-app.com/api/user/user-reset-password/${user._id}/${token.token}`;
     const text =
       "Bonjour, pour changer votre mot de passe veuillez suivre le lien ci après : ";
     await sendEmail(

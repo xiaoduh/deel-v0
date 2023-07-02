@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
 
-const conversationSchema = mongoose.Schema(
+const roomSchema = mongoose.Schema(
   {
-    leadID: {
+    annonceID: {
+      type: String,
+      required: true,
+    },
+    posterID: {
       type: String,
       required: true,
     },
@@ -10,9 +14,10 @@ const conversationSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    dealerID: {
+    uniqueID: {
       type: String,
       required: true,
+      unique: true,
     },
   },
   {
@@ -20,4 +25,4 @@ const conversationSchema = mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("conversation", conversationSchema);
+module.exports = mongoose.model("room", roomSchema);

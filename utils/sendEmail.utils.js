@@ -6,12 +6,12 @@ const sendEmail = async (email, subject, text, link) => {
       service: "gmail",
       auth: {
         user: "therealbigdeeel@gmail.com",
-        pass: "swkenxwkmmiyyyqn",
+        pass: "mmazhfocikkdkcsl",
       },
     });
 
     await transporter.sendMail({
-      from: "no-reply deeel.fr",
+      from: "no-reply deeel",
       to: email,
       subject: subject,
       text: text + link,
