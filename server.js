@@ -51,11 +51,8 @@ app.get("/jwtid", requireAuth, (req, res) => {
 });
 
 // routes
-app.use("/api/lead", leadRoutes);
 app.use("/api/user", userRoutes);
-app.use("/api/coin", coinRoutes);
 app.use("/api/stripe", stripeRoutes);
-app.use("/api/conversation", conversationRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/annonce", annonceRoutes);
 app.use("/api/room", roomRoutes);
