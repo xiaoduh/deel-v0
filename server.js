@@ -106,7 +106,7 @@ wss.on("connection", (connection, req) => {
       msgData.message.text &&
       msgData.message.sender
     ) {
-      const user = await UserModel.findById(msgData.message.recipientID);
+      const user = await UserModel.findById(msgData.message.recipient);
       const messageDoc = await MessageModel.create({
         roomID: msgData.message.uniqueRoomID,
         senderID: msgData.message.sender,
