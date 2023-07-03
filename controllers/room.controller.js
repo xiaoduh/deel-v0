@@ -29,8 +29,8 @@ module.exports.createRoom = async (req, res) => {
       });
       const user = await UserModel.findById(req.body.posterID);
       // console.log(user);
-      const url1 = "www.google.com";
-      const url2 = "www.google.com";
+      const url1 = "https://deeel-app.com/";
+      const url2 = "https://deeel-app.com/";
       const text = `Bonjour ${user.pseudo}, un informateur s'est intéressé à votre recherche. Connectez-vous pour prendre contact avec lui. ${url1} Cordialement, deeel `;
 
       await sendEmail(

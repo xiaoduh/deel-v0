@@ -112,6 +112,17 @@ wss.on("connection", (connection, req) => {
         recipientID: msgData.message.recipient,
         text: msgData.message.text,
       });
+      const user = await UserModel.findById(msgData.message.recipientID);
+
+      const url2 = "https://deeel-app.com/";
+      const text = `Bonjour ${user.pseudo}, vous venez de recevoir un message «${msgData.message.text}». Connectez-vous pour répondre. Cordialement, deeel `;
+
+      await sendEmail(
+        user.email,
+        "Vous avez reçu un message - deeel",
+        text,
+        url2
+      );
       [...wss.clients]
         .filter((c) => c.userId === msgData.message.recipient)
         .forEach((c) =>
@@ -134,7 +145,7 @@ wss.on("connection", (connection, req) => {
         { $set: { price: msgData.message.price } }
       );
 
-      const url2 = "www.google.com";
+      const url2 = "https://deeel-app.com/";
       const text = `Bonjour ${user.pseudo}, vous venez de recevoir une offre d'un informateur. Connectez-vous pour accepter ou refuser l'offre. Cordialement, deeel `;
 
       await sendEmail(

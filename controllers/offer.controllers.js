@@ -43,7 +43,7 @@ module.exports.ModifyOffer = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const url2 = "www.google.com";
+    const url2 = "https://deeel-app.com/";
     const text = `Bonjour ${user.pseudo}, votre offre a été accepté. Connectez-vous pour partager l'information à votre client. Cordialement, deeel `;
 
     await sendEmail(
