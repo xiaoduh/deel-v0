@@ -106,23 +106,25 @@ wss.on("connection", (connection, req) => {
       msgData.message.text &&
       msgData.message.sender
     ) {
+      const user = await UserModel.findById(msgData.message.recipientID);
       const messageDoc = await MessageModel.create({
         roomID: msgData.message.uniqueRoomID,
         senderID: msgData.message.sender,
         recipientID: msgData.message.recipient,
         text: msgData.message.text,
       });
-      const user = await UserModel.findById(msgData.message.recipientID);
+      if (user) {
+        const url2 = "https://deeel-app.com/";
+        const text = `Bonjour ${user.pseudo}, vous venez de recevoir un message «${msgData.message.text}». Connectez-vous pour répondre. Cordialement, deeel `;
 
-      const url2 = "https://deeel-app.com/";
-      const text = `Bonjour ${user.pseudo}, vous venez de recevoir un message «${msgData.message.text}». Connectez-vous pour répondre. Cordialement, deeel `;
+        await sendEmail(
+          user.email,
+          "Vous avez reçu un message - deeel",
+          text,
+          url2
+        );
+      }
 
-      await sendEmail(
-        user.email,
-        "Vous avez reçu un message - deeel",
-        text,
-        url2
-      );
       [...wss.clients]
         .filter((c) => c.userId === msgData.message.recipient)
         .forEach((c) =>
