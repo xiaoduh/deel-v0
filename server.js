@@ -24,7 +24,7 @@ const app = express();
 // origin: "http://localhost:3000",
 
 const corsOptions = {
-  AccessControlAllowOrigin: "https://deeel-app.com/",
+  AccessControlAllowOrigin: "*",
   origin: "https://deeel-app.com/",
   credentials: true,
   allowedHeaders: ["sessionId", "Content-Type"],
