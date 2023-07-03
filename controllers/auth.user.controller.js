@@ -196,6 +196,8 @@ module.exports.signInUser = async (req, res) => {
     console.log(user);
     const token = createToken(user._id);
     res.cookie("jwt", token, {
+      domain: "deeel-app.com",
+      secure: true,
       httpOnly: true,
       maxAge: maxAge,
       SameSite: "None",
