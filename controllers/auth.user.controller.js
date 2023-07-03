@@ -14,6 +14,11 @@ const createToken = (id) => {
     "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5ceyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
     {
       expiresIn: maxAge,
+      domain: "deeel-app.com",
+      secure: true,
+      httpOnly: true,
+      maxAge: maxAge,
+      sameSite: "None",
     }
   );
 };
