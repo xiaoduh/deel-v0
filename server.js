@@ -25,7 +25,7 @@ const app = express();
 
 const corsOptions = {
   AccessControlAllowOrigin: "https://deeel-app.com",
-  origin: false,
+  origin: "https://deeel-app.com",
   credentials: true,
   allowedHeaders: ["sessionId", "Content-Type"],
   exposedHeaders: ["sessionId"],
