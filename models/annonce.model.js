@@ -18,7 +18,7 @@ const annonceSchema = mongoose.Schema(
     detail: {
       type: String,
       required: true,
-      maxLength: 160,
+      maxLength: 200,
     },
     result: {
       type: String,
