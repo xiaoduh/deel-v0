@@ -10,7 +10,7 @@ module.exports.payment = async (req, res) => {
   let { amount, id } = req.body;
   console.log("amount & id", amount, id);
 
-  const parsedAmount = amount.replaceAll(".", "");
+  const parsedAmount = amount.replace(".", "");
 
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID user unknown : " + req.params.id);
