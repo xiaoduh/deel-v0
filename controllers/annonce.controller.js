@@ -2,7 +2,7 @@ const AnnonceModel = require("../models/annonce.model");
 
 module.exports.postAnnonce = async (req, res) => {
   try {
-    console.log("object");
+    const user = await UserModel.findById(req.body.posterID);
     const newAnnonce = await AnnonceModel.create({
       posterID: req.body.posterID,
       type: req.body.type,
@@ -11,7 +11,13 @@ module.exports.postAnnonce = async (req, res) => {
       result: req.body.result,
       budgetMax: req.body.budgetMax,
     });
-    res.status(200).json(newAnnonce);
+    console.log(newAnnonce);
+    const userModified = await UserModel.findByIdAndUpdate(
+      req.body.posterID,
+      { $set: { nb_annonce: user.nb_annonce + 1 } },
+      { new: true }
+    );
+    console.log(userModified);
   } catch (error) {
     res.status(500).json(error);
   }
