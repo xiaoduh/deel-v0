@@ -5,13 +5,13 @@ const sendEmail = async (email, subject, text, link) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "clement.lidar@gmail.com",
-        pass: "rmhjuehtjshchcte",
+        user: "therealbigdeeel@gmail.com",
+        pass: "mmazhfocikkdkcsl",
       },
     });
 
     await transporter.sendMail({
-      from: "no-reply Tekos",
+      from: "no-reply deeel",
       to: email,
       subject: subject,
       text: text + link,

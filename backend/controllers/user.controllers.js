@@ -2,18 +2,33 @@ const UserModel = require("../models/user.model");
 const ObjectID = require("mongoose").Types.ObjectId;
 const sendEmail = require("../utils/sendEmail.utils");
 
-module.exports.editUser = async (req, res) => {
+module.exports.countAnnonce = async (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID user unknown : " + req.params.id);
+
+  const user = await UserModel.findById(req.params.id);
 
   const updateUser = await UserModel.findByIdAndUpdate(
     req.params.id,
     {
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      email: req.body.email,
-      phone_number: req.body.phone_number,
-      password: req.body.password,
+      nb_annonce: user.nb_annonce + 1,
+    },
+    { new: true }
+  );
+
+  return res.status(200).json(updateUser);
+};
+
+module.exports.countResponse = async (req, res) => {
+  if (!ObjectID.isValid(req.params.id))
+    return res.status(400).send("ID user unknown : " + req.params.id);
+
+  const user = await UserModel.findById(req.params.id);
+
+  const updateUser = await UserModel.findByIdAndUpdate(
+    req.params.id,
+    {
+      nb_response_annonce: user.nb_response_annonce + 1,
     },
     { new: true }
   );

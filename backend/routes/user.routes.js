@@ -20,7 +20,8 @@ router.put(
 // user CRUD
 router.get("/:id", userController.getUniqueUser);
 router.get("/", userController.getAllUsers);
-router.put("/:id", userController.editUser);
+router.put("/count-annonce/:id", userController.countAnnonce);
+router.put("/count-response/:id", userController.countResponse);
 // route pour effectuer une demande de retrait
 router.put("/withdraw/:id", userController.convertCredit);
 
